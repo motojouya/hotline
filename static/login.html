@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<HTML lang="UTF-8">
+<head>
+  <title>ログイン psps [大切な人ともっとつながる]<title>
+  <style>
+  </style>
+  <script>
+  import agent form 'superagent';
+  window.addEventListner('DOMContentLoaded', function (event) {
+
+    var getQueryItems = function (query) {
+
+      if (!query) {
+        return;
+      }
+
+      var paramEntry = query.slice(1).split('&')
+        , i = 0
+        , len = paramEntry.length
+        , queryItems = {}
+        , queryItem;
+
+      for (;i < len; i++) {
+        queryItem = paramEntry[i].split('=');
+        queryItems[queryItem[0]] = queryItem[1];
+      }
+      return queryItems;
+    };
+
+    document.getElementById('login_execute')
+      .addEventListner('onclick', function (event) {
+
+      var userid = document.getElementById('userid')
+        , password = document.getElementById('password')
+        , queryItems = getQueryItems(location.search);
+
+      if (!userid !password) {
+        alert('ユーザIDとパスワードを入力してください');
+        return;
+      }
+
+      agent.post('/api/v1/login')
+        .send({
+          userid: userid
+         ,password: loginpassword
+         ,onetimepassword: queryItems.onetimePassword
+        }).end(function (err, res) {
+
+          var func;
+          if (err) {
+            alert('通信環境のいい場所で、再度お試しください');
+          }
+          if (!res.body.success) {
+            document.getElementById('login_message').text = 'ユーザIDもしくはパスワードが違います';
+            return;
+          }
+
+          func = queryItems.func;
+          switch (queryItems.func) {
+          case 'config' :
+            location.assign('/app/config');
+            return;
+          case 'relation' :
+            location.assign('/app/relation');
+            return;
+          default :
+          }
+          if (func) {
+            location.assign('/app/relation/' + func);
+            return;
+          } else {
+            location.assign('/app');
+            return;
+          }
+        });
+    });
+  });
+  </script>
+</head>
+
+<body>
+  <main>
+    <div id="login_message" ></div>
+    <form id="registerConfirm" method="post">
+      <input type="hidden" id="onetime_password" name="onetime_password">
+      <input id="userid" type="text" name="userid">
+      <input type="password" name="password">
+      <button type="button" value="ログイン" id="login_execute">
+    </form>
+  </main>
+</body>
+</HTML>

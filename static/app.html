@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="UTF-8">
+<head>
+  <title>psps [大切な人ともっとつながる]<title>
+  <style>
+  </style>
+</head>
+
+<body>
+  <main id="main">
+    <div id="loading" class="loading">
+      <h1>psps</h1>
+      <span class="rotate">読</span>
+      <span class="rotate">込</span>
+      <span class="rotate">中</span>
+    </div>
+  </main>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/riot/2.3.18/riot+compiler.js'></script>
+  <script src="/lib/store.js">
+  <script src="/lib/xhr.js">
+  <script src="/lib/utils.js">
+  <script src="/lib/application.js">
+  <script>
+  window.addEventListner('DOMContentLoaded', function (event) {
+    var mainTag = document.getElementById('main');
+    application(window, document, history, location, xhr, store, mainTag, riot, function (isPause) {
+      var loadingClasses = document.getElementById('loading').classList;
+      if (isPause) {
+        loadingClasses.remove('invisible');
+      } else {
+        loadingClasses.add('invisible');
+      }
+    });
+  });
+  </script>
+</body>
+</html>
