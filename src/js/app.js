@@ -194,7 +194,7 @@ export default function (win, doc, hstry, loc, xhr, store, mainTag, riot, pause)
     script.onload = function () {
       riot.mount('#' + tagId, tagName, opts);
       pause(false);
-    });
+    };
     script.src = '/lib/' + tagname + '.tag';
     div.apendChild(script);
     div.apendChild(tag);
@@ -231,7 +231,7 @@ export default function (win, doc, hstry, loc, xhr, store, mainTag, riot, pause)
         return change('chat' + relationNo, 'chat', {
           schema: {
             relation: relation
-            voices: store.getVoices(relation.userid)
+           ,voices: store.getVoices(relation.userid)
           }
          ,duties: {
             sendMessage: sendWSMessage
