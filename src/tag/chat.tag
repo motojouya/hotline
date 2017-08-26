@@ -29,7 +29,7 @@
   this.duties = opt.duties;
   this.relation = schema.relation;
   this.voices = schema.voices;
-  this.pendingVoices = []
+  this.pendingVoices = [];
   this.message;
 
   voices.on('change', function (){
