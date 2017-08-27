@@ -1,10 +1,10 @@
 {
-  "name": "psps",
+  "name": "hotline",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start app.js -i max",
+    "start": "pm2 start index.js -i max",
     "riot": "riot src/tag public/js",
     "babel": "babel src/lib -d public/js && babel src/client -d public/js",
     "compile": "npm run riot && npm run babel",
@@ -28,6 +28,7 @@
     "webpack": "^3.5.5"
   },
   "dependencies": {
-    "express": "^4.15.4"
+    "express": "^4.15.4",
+    "pm2": "^2.6.1"
   }
 }
