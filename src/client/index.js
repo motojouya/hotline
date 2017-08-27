@@ -1,6 +1,6 @@
 import application from './app';
-import xhr from './xhr';
-import store from './store';
+import xhr from '../lib/xhr_mock';
+import store from '../lib/store';
 import riot from 'riot';
 
 window.addEventListner('DOMContentLoaded', function (event) {
