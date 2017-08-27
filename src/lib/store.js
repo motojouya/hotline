@@ -49,7 +49,7 @@ var setConfig = function (name, obj) {
 };
 
 var getVoices = function (userid) {
-  var chats[userid] || new VoiceCollection();
+  chats[userid] = chats[userid] || new VoiceCollection();
   return chats[userid];
 };
 

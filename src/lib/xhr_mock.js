@@ -49,12 +49,11 @@ var breakRelation = function (userid, callback) {
   callback(null, {isSuccess: true, message: '関係を解消しました', userid: userid});
 };
 
-
 var getRelations = function (offset, limit, callback) {
   callback(null, {isSuccess: true, message: '', result: links});
 };
 
-var getVoices = function (userid, offset, limit, callback); {
+var getVoices = function (userid, offset, limit, callback) {
   callback(null, {isSuccess: true, message: '', result: voices});
 };
 

@@ -2,9 +2,17 @@
   "name": "psps",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "pm2 start app.js -i max",
+    "riot": "riot src/tag public/js",
+    "babel": "babel src/lib -d public/js && babel src/client -d public/js",
+    "compile": "npm run riot && npm run babel",
+    "build": "npm run compile",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "uglify": "",
+    "less": "lessc ",
+    "webpack": ""
   },
   "author": "",
   "license": "ISC",
