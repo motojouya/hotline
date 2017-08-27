@@ -1,7 +1,8 @@
-export default function (win, doc, hstry, loc, xhr, store, mainTag, riot, pause) {
+export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pause) {
 
   const relation_request_size = 20;
   const voice_request_size = 100;
+  const store = getStore(riot.observable);
 
   var removeIfSuffix = function (path, suffix) {
     if (path.endsWith(suffix)) {

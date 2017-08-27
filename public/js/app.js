@@ -4,10 +4,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-exports.default = function (win, doc, hstry, loc, xhr, store, mainTag, riot, pause) {
+exports.default = function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pause) {
 
   var relation_request_size = 20;
   var voice_request_size = 100;
+  var store = getStore(riot.observable);
 
   var removeIfSuffix = function removeIfSuffix(path, suffix) {
     if (path.endsWith(suffix)) {
