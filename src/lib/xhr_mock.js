@@ -1,8 +1,8 @@
 import agent from 'superagent';
 
-var links = [
-  {no: 1, apply: "hamada", accept: "matsumoto", status: 1, clap: "2017-07-02 10:10:10", message: "2017-07-01 12:34:56", call: "2017-06-17 11:21:45"}
- ,{no: 2, apply: "matsumoto", accept: "hamada", status: 1, clap: "2017-04-09 23:12:11", message: "2017-04-09 23:12:21", call: null}
+var relations = [
+  {no: 1, userid: "hamada", apply: "hamada", accept: "matsumoto", status: 1, clap: "2017-07-02 10:10:10", message: "2017-07-01 12:34:56", call: "2017-06-17 11:21:45"}
+ ,{no: 2, userid: "hamada", apply: "matsumoto", accept: "hamada", status: 1, clap: "2017-04-09 23:12:11", message: "2017-04-09 23:12:21", call: null}
 ];
 
 var voices = [
@@ -39,42 +39,45 @@ var connectWebSocket = function (callback, recover) {
 
 var makeRelation = function (userid, countersign, callback) {
   if (userid === 'yamada' && countersign === 'america') {
-    callback(null, {isSuccess: true, message: 'ツナガルリクエストを送信しました', userid: userid});
+    callback(null, {result: true, payload: relations[0]});
   } else {
-    callback(null, {isSuccess: false, message: '拒否されました', userid: userid});
+    callback(null, {result: false, payload: relations[0]});
   }
 };
 
 var breakRelation = function (userid, callback) {
-  callback(null, {isSuccess: true, message: '関係を解消しました', userid: userid});
+  callback(null, {result: true, payload: relations[0]});
 };
 
 var getRelations = function (offset, limit, callback) {
-  callback(null, {isSuccess: true, message: '', result: links});
+  callback(null, {hasNext: false, payload: relations});
 };
 
 var getVoices = function (userid, offset, limit, callback) {
-  callback(null, {isSuccess: true, message: '', result: voices});
+  callback(null, {hasNext: false, payload: voices});
 };
 
 var getConfig = function (callback) {
   callback(null, {
-    userid: 'userid',
-    name: '',
-    email: 'test@gmail.com',
-    countersign: 'peru',
-    colorNumber: 4,
-    thumbnail: '',
-    notification: 0,
+    result: true,
+    payload: {
+      userid: 'userid',
+      name: '',
+      email: 'test@gmail.com',
+      countersign: 'peru',
+      colorNumber: 4,
+      thumbnail: '',
+      notification: 0,
+    }
   });
 };
 
 var changeConfig = function (payload, callback) {
-  callback(null, {isSuccess: true, payload: payload});
+  callback(null, {result: true, payload: payload});
 };
 
 var configThumbnail = function (file, callback) {
-  callback(null, {isSuccess: true, file: file, message: 'サムネイル画像を変更しました'});
+  callback(null, {result: true, payload: file});
 };
 
 export default {

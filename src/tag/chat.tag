@@ -96,4 +96,4 @@
   .self {
   }
 </style>
-<chat>
+</chat>

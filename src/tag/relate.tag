@@ -90,4 +90,4 @@
   .thumbnail {
   }
 </style>
-<relate>
+</relate>

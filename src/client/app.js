@@ -47,7 +47,7 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       if (err) {
         return;
       }
-      data = res.body;
+      data = res.payload;
       for (key in data) {
         if (data.hasOwnProperty(key)) {
           store.setConfig(key, data[key]);
@@ -61,7 +61,7 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       if (err) {
         return;
       }
-      store.setConfig('thumbnail', res.body.payload);
+      store.setConfig('thumbnail', res.payload);
     });
   };
 
@@ -84,8 +84,8 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       if (err) {
         return;
       }
-      data = res.body;
-      store.setRelation(data.userid, data);
+      data = res.payload;
+      store.setRelation([data]);
     });
   };
 
@@ -95,8 +95,8 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       if (err) {
         return;
       }
-      data = res.body;
-      store.setRelation(data.userid, data);
+      data = res.payload;
+      store.setRelation([data]);
     });
   };
 
@@ -123,19 +123,20 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
   };
 
   var loadRelations = function (offset) {
-    xhr.getRelations(offset, relation_request_size, function (err, res){
+    var callback = function cbRelations(err, res) {
       var data
         , payload;
       if (err) {
         return;
       }
-      data = res.body;
+      data = res;
       payload = data.payload;
       store.setRelations(payload);
       if (data.hasNext) {
-        getRelations(offset + payload.length);
+        setTimeout(xhr.getRelations(offset + payload.length, relation_request_size, cbRelations), 1000);
       }
-    });
+    };
+    xhr.getRelations(offset, relation_request_size, callback);
   };
 
   var loadConfig = function () {
@@ -143,7 +144,7 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       if (err) {
         return;
       }
-      store.setConfig(res.body.payload);
+      store.setConfig(res.payload);
     });
   };
 
@@ -196,12 +197,12 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       riot.mount('#' + tagId, tagName, opts);
       pause(false);
     };
-    script.src = '/lib/' + tagname + '.tag';
-    div.apendChild(script);
-    div.apendChild(tag);
+    script.src = './tag/' + tagName + '.js';
+    div.appendChild(script);
+    div.appendChild(tag);
     div.setAttribute('id', tagId);
 
-    mainTag.apendChild(div);
+    mainTag.appendChild(div);
     domItems[tagId] = div;
   };
 

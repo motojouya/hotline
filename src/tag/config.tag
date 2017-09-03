@@ -171,4 +171,4 @@
   .thumbnail {
   }
 </style>
-<config>
+</config>

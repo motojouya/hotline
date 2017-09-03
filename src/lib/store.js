@@ -16,14 +16,17 @@ export default function (observable) {
     var i = 0
       , len = ary.length
       , relation
-      , key;
+      , key
+      , obj;
     for (; i < len; i++) {
-      relation = relations.get(ary[i].userid) || new Relation(ary[i]);
-      for (key in ary[i]) {
-        if (ary[i].hasOwnProperty(key)) {
-          relation.set(key, ary[i][key])
+      obj = ary[i];
+      relation = relations[obj.userid] || {};
+      for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          relation[key] = obj[key];
         }
       }
+      relations[obj.userid] = relation;
     }
   };
   
@@ -35,11 +38,11 @@ export default function (observable) {
     var key;
     if (!obj) {
       obj = name;
-      config.set(name, obj);
+      config[name] = obj;
     } else {
       for (key in obj) {
         if (obj.hasOwnProperty(key)) {
-          config.set(key, obj[key]);
+          config[key] = obj[key];
         }
       }
     }
