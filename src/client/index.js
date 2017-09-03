@@ -1,7 +1,6 @@
 import application from './app';
 import xhr from '../lib/xhr_mock';
 import store from '../lib/store';
-import riot from 'riot';
 
 window.addEventListener('DOMContentLoaded', function (event) {
   var mainTag = document.getElementById('main');

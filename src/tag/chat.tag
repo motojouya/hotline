@@ -1,7 +1,7 @@
 <chat>
 <div class="titlebar">
   <div>
-    <span class="topback"><a href="/" onclick={parent.move}>←</a></span>
+    <span class="topback"><a href="/app" onclick={move}>←</a></span>
     <div class="thumbnail_wrap">
       <image src={relateduser.thumbnail} alt="サムネイル画像" />
     </div>
@@ -25,8 +25,8 @@
   <textarea onkeyup={speak} onchange={speak}>{message}</textarea>
 </div>
 <script>
-  this.schema = opt.schema;
-  this.duties = opt.duties;
+  this.schema = opts.schema;
+  this.duties = opts.duties;
   this.relation = schema.relation;
   this.voices = schema.voices;
   this.pendingVoices = [];
@@ -77,7 +77,7 @@
 
   move(event) {
     event.preventDefault();
-    duties.transfer(event.target.a.href);
+    duties.transfer(event.target.pathname);
   }
 </script>
 <style>

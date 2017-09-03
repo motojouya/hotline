@@ -1,6 +1,6 @@
 <config>
 <div class="titlebar">
-  <span class="topback"><a href="/app" onclick={parent.move}>←</a></span>
+  <span class="topback"><a href="/app" onclick={move}>←</a></span>
   <h3 class="title">Hotline</h3>
 </div>
 <dl class="configs">
@@ -54,8 +54,8 @@
   <input type="text" />
 </div>
 <script>
-  this.configs = opt.schema;
-  this.duties = opt.duties;
+  this.configs = opts.schema;
+  this.duties = opts.duties;
   this.reserveChangeConfig = {};
 
   var history = window.history;
@@ -145,7 +145,7 @@
 
   move(event) {
     event.preventDefault();
-    duties.transfer(event.target.a.href);
+    duties.transfer(event.target.pathname);
   }
 </script>
 <style>

@@ -39,8 +39,8 @@
   </virtual>
 </dl>
 <script>
-  this.relation = opt.schema;
-  this.duties = opt.duties;
+  this.relation = opts.schema;
+  this.duties = opts.duties;
   this.userid;
   this.countersign;
 
@@ -64,7 +64,7 @@
 
   move(event) {
     event.preventDefault();
-    duties.transfer(event.target.a.href);
+    duties.transfer(event.target.pathname);
   }
 </script>
 <style>
