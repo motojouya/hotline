@@ -1,5 +1,5 @@
 
-node_modules/
-dist/
-building/
+node/node_modules/
+node/dist/
+node/building/
 
