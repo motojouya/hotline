@@ -1,6 +1,6 @@
 <config>
 <div class="titlebar">
-  <span class="topback"><a href="/app" onclick={move}>←</a></span>
+  <span class="topback"><a href="/app/" onclick={move}>←</a></span>
   <h3 class="title">Hotline</h3>
 </div>
 <dl class="configs">
@@ -50,16 +50,11 @@
     </label>
   </dd>
 </dl>
-<div class="hidden_popup">
-  <input type="text" />
-</div>
 <script>
-  this.configs = opts.schema;
-  this.duties = opts.duties;
-  this.reserveChangeConfig = {};
 
-  var history = window.history;
-  var themeColor;
+  var reserveChangeConfig = {},
+      duties = opts.duties;
+
   var serializeColor = function (colorNumber) {
     return '333';
   };
@@ -67,10 +62,14 @@
     return 20;
   };
 
+  this.configs = opts.schema;
+  this.themeColor = null;
+
   changeColor(event) {
     var reservation = reserveChangeConfig['color']
-      , colorNumber = event.target.value
-      , themeColor = utils.serializeColor(colorNumber);
+      , colorNumber = event.target.value;
+
+    this.themeColor = serializeColor(colorNumber);
 
     if (reservation) {
       canselTimeout(reservation);
@@ -81,8 +80,8 @@
   }
 
   changeThumbnail(event) {
-    var reservation = reserveChangeConfig['thumbnail']
-      , thumbnail = event.target.file;
+    var reservation = reserveChangeConfig['thumbnail'],
+        thumbnail = event.target.file;
     if (reservation) {
       canselTimeout(reservation);
     }
@@ -110,8 +109,8 @@
   }
 
   changeNotification(event) {
-    var reservation = reserveChangeConfig['notification']
-      , notification = event.target.value;
+    var reservation = reserveChangeConfig['notification'],
+        notification = event.target.value;
     if (reservation) {
       canselTimeout(reservation);
     }

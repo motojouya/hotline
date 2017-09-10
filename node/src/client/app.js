@@ -4,6 +4,8 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
   const voice_request_size = 100;
   const store = getStore(riot.observable);
 
+  var domItems = {};
+
   var removeIfSuffix = function (path, suffix) {
     if (path.endsWith(suffix)) {
       path = path.slice(0, (-1 * suffix.length));
@@ -11,33 +13,111 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
     return path;
   };
 
-  var transfer = function (href) {
-    var path = removeIfSuffix(href, '/')
+  var change = function (tagName, tagId, opts) {
+
+    var div = doc.createElement('div')
+      , tag = doc.createElement('menu')
+      , script = doc.createElement('script');
+
+    for (var key in domItems) {
+      if (domItems.hasOwnProperty(key)) {
+        domItems[key].parentNode.removeChild(domItems[key]);
+        delete domItems[key];
+      }
+    }
+    pause(true);
+
+    script.onload = function () {
+      riot.mount('#' + tagId, tagName, opts);
+      pause(false);
+    };
+    script.src = '/app/tag/' + tagName + '.js';
+    div.appendChild(script);
+    div.appendChild(tag);
+    div.setAttribute('id', tagId);
+
+    mainTag.appendChild(div);
+    domItems[tagId] = div;
+  };
+
+  var changeState = function (state) {
+    switch (state.pane) {
+
+    case 'menu':
+      return change('menu', 'menu', {
+        schema: store.getRelations()
+       ,duties: {transfer: transfer}
+      });
+
+    case 'config':
+      return change('config', 'config', {
+        schema: store.getConfig()
+       ,duties: {
+          changeConfig: changeConfig
+         ,configThumbnail: configThumbnail
+         ,configLoginPassword: configLoginPassword
+         ,transfer: transfer
+        }
+      });
+
+    case 'relation':
+      var relation = store.getRelations(state.relationNo);
+
+      if (relation && relation.status == 'ACTIVE') {
+        return change('chat' + state.relationNo, 'chat', {
+          schema: {
+            relation: relation
+           ,voices: store.getVoices(relation.userid)
+          }
+         ,duties: {
+            sendMessage: sendWSMessage
+           ,breakRelation: breakRelation
+           ,transfer: transfer
+          }
+        });
+
+      } else {
+        return change('relate', 'relate', {
+          schema: relation
+         ,duties: {
+            makeRelation: makeRelation
+           ,breakRelation: breakRelation
+           ,transfer: transfer
+          }
+        });
+      }
+
+    default: //do nothing
+    }
+  };
+
+  var transfer = function (pathname) {
+    var path = removeIfSuffix(pathname, '/')
       , nextState;
 
     switch (path) {
     case '/app':
       nextState = {pane: 'menu'};
-      hstry.pushState(nextState, 'menu', href);
-      return;
+      hstry.pushState(nextState, 'menu', pathname);
+      break;
     case '/app/config':
       nextState = {pane: 'config'};
-      hstry.pushState(nextState, 'config', href);
-      return;
+      hstry.pushState(nextState, 'config', pathname);
+      break;
     case '/app/relation':
       nextState = {pane: 'relation'};
-      hstry.pushState(nextState, 'relation', href);
-      return;
-    default: //do nothing
+      hstry.pushState(nextState, 'relation', pathname);
+      break;
+    default:
+      if (path.startsWith('/app/relation/')) {
+        nextState = {
+          pane: 'relation'
+         ,relationNo: path.slice('/app/relation/'.length).split('/')[0]
+        };
+        hstry.pushState(nextState, 'relation', pathname);
+      }
     }
-    if (path.startsWith('/app/relation/')) {
-      nextState = {
-        pane: 'relation'
-       ,relationNo: path.slice('/app/relation/'.length).split('/')[0]
-      };
-      hstry.pushState(nextState, 'relation', href);
-      return;
-    }
+    changeState(nextState);
   };
 
   var changeConfig = function (payload) {
@@ -148,23 +228,23 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
     });
   };
 
-  var replaceInitialState = function (href, pathName) {
+  var replaceInitialState = function (pathname) {
 
-    var path = removeIfSuffix(pathName, '/')
+    var path = removeIfSuffix(pathname, '/')
       , firstLoadedState;
 
     switch (path) {
     case '/app':
       firstLoadedState = {pane: 'menu'};
-      hstry.replaceState(firstLoadedState, 'menu', href);
+      hstry.replaceState(firstLoadedState, 'menu', pathname);
       return firstLoadedState;
     case '/app/config':
       firstLoadedState = {pane: 'config'};
-      hstry.replaceState(firstLoadedState, 'config', href);
+      hstry.replaceState(firstLoadedState, 'config', pathname);
       return firstLoadedState;
     case '/app/relation':
       firstLoadedState = {pane: 'relation'};
-      hstry.replaceState(firstLoadedState, 'relation', href);
+      hstry.replaceState(firstLoadedState, 'relation', pathname);
       return firstLoadedState;
     default: //do nothing
     }
@@ -173,87 +253,8 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
         pane: 'relation'
        ,relationNo: path.slice('/app/relation/'.length).split('/')[0]
       };
-      hstry.replaceState(firstLoadedState, 'relation', href);
+      hstry.replaceState(firstLoadedState, 'relation', pathname);
       return firstLoadedState;
-    }
-  };
-
-  var domItems = {};
-
-  var change = function (tagName, tagId, opts) {
-
-    var div = doc.createElement('div')
-      , tag = doc.createElement('menu')
-      , script = doc.createElement('script');
-
-    for (var key in domItems) {
-      if (domItems.hasOwnProperty(key)) {
-        domitems[key].parentNode.removeChild(domitems[key]);
-      }
-    }
-    pause(true);
-
-    script.onload = function () {
-      riot.mount('#' + tagId, tagName, opts);
-      pause(false);
-    };
-    script.src = './tag/' + tagName + '.js';
-    div.appendChild(script);
-    div.appendChild(tag);
-    div.setAttribute('id', tagId);
-
-    mainTag.appendChild(div);
-    domItems[tagId] = div;
-  };
-
-  var changeState = function (state) {
-    switch (state.pane) {
-
-    case 'menu':
-      return change('menu', 'menu', {
-        schema: store.getRelations()
-       ,duties: {transfer: transfer}
-      });
-
-    case 'config':
-      return change('config', 'config', {
-        schema: store.getConfig()
-       ,duties: {
-          changeConfig: changeConfig
-         ,configThumbnail: configThumbnail
-         ,configLoginPassword: configLoginPassword
-         ,transfer: transfer
-        }
-      });
-
-    case 'relation':
-      var relation = store.getRelation(state.relationNo);
-
-      if (relation && relation.status == 'ACTIVE') {
-        return change('chat' + relationNo, 'chat', {
-          schema: {
-            relation: relation
-           ,voices: store.getVoices(relation.userid)
-          }
-         ,duties: {
-            sendMessage: sendWSMessage
-           ,breakRelation: breakRelation
-           ,transfer: transfer
-          }
-        });
-
-      } else {
-        return change('relate', 'relate', {
-          schema: relation
-         ,duties: {
-            makeRelation: makeRelation
-           ,breakRelation: breakRelation
-           ,transfer: transfer
-          }
-        });
-      }
-
-    default: //do nothing
     }
   };
 
@@ -264,7 +265,7 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
     win.addEventListener('popstate', function (event) {
       changeState(event.state);
     });
-    changeState(replaceInitialState(loc.href, loc.pathname));
+    changeState(replaceInitialState(loc.pathname));
   };
 
   init();

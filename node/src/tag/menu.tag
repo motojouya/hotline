@@ -1,14 +1,14 @@
 <menu>
 <div class="titlebar">
   <h3 class="title">PSPS</h3>
-  <span class="configlink"><a href="config" onclick={move}>設定</a></span>
+  <span class="configlink"><a href="/app/config/" onclick={move}>設定</a></span>
 </div>
 <ul class="userlist">
   <li>
-    <a href="relation" onclick={move}>+つながる</a>
+    <a href="/app/relation" onclick={move}>+つながる</a>
   </li>
   <li class="relateduser" each={relationAry}>
-    <a href="relation/{userid}" onclick={parent.move}>{name}</a>
+    <a href="/app/relation/{userid}/" onclick={parent.move}>{name}</a>
   </li>
 </ul>
 <script>

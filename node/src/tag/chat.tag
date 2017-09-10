@@ -1,7 +1,7 @@
 <chat>
 <div class="titlebar">
   <div>
-    <span class="topback"><a href="/app" onclick={move}>←</a></span>
+    <span class="topback"><a href="/app/" onclick={move}>←</a></span>
     <div class="thumbnail_wrap">
       <image src={relateduser.thumbnail} alt="サムネイル画像" />
     </div>
@@ -15,22 +15,23 @@
 </div>
 <ul class="voicelist">
   <li class="relateduser" each={voices}>
-    <span class={utils.isSelf(parent.relateduser.userid, userid): self}>{message}<span>
+    <span class={(parent.relateduser.userid === userid): self}>{message}<span>
   </li>
-  <li class="relateduser" each={pendingVoices}>
-    <span class={utils.isSelf(parent.relateduser.userid, userid): self}>{message}<span>
+  <li class="relateduser" >
+    <span class={(parent.relateduser.userid === userid): self}>{pendingVoice}<span>
   </li>
 </ul>
 <div>
-  <textarea onkeyup={speak} onchange={speak}>{message}</textarea>
+  <textarea onkeyup={speak} onchange={speak} ref="message" ></textarea>
 </div>
 <script>
-  this.schema = opts.schema;
-  this.duties = opts.duties;
+
+  var duties = opts.duties,
+      schema = opts.schema;
+
   this.relation = schema.relation;
   this.voices = schema.voices;
-  this.pendingVoices = [];
-  this.message;
+  this.pendingVoice = null;
 
   voices.on('change', function (){
     this.update();
@@ -41,22 +42,23 @@
   speak(event) {
 
     var key = event.key
-      , messageLines = event.target.value.split(/\r\n|\r|\n/)
+      , messageLines = this.refs.message.value.split(/\r\n|\r|\n/)
       , i = 0
-      , len = messageLines.length;
+      , len = messageLines.length
 
     event.preventDefault();
+
     if (len > 1) {
       for (; i < len - 1; i++) {
         duties.sendMessage(messageLines[i], true);
-        pendingVoices.push(message);
       }
-      message = messageLines[len - 1];
+      this.refs.message.value = messageLines[len - 1];
     }
     if (key === 13) {
       duties.sendMessage(messageLines[len - 1], true);
-      pendingVoices.push(message);
-      message = '';
+      this.refs.message.value = '';
+    } else {
+      this.pendingVoice.push(messageLines[len - 1]);
     }
   }
 
@@ -68,7 +70,7 @@
     if (!confirm('ホットラインを解消してもよいですか？')) {
       return;
     }
-    duties.breakRelation(relation.userid);
+    duties.breakRelation(this.relation.userid);
   }
 
   openOptions(event) {

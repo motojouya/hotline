@@ -1,6 +1,6 @@
 <relate>
 <div class="titlebar">
-  <span class="topback"><a href="/app" onclick={move}>←</a></span>
+  <span class="topback"><a href="/app/" onclick={move}>←</a></span>
   <h3 class="title">Hotline</h3>
 </div>
 <div>
@@ -24,13 +24,13 @@
   <virtual if={!relation}>
     <dt>相手のID</dt>
     <dd>
-      <input type="text" name="userid" value={userid} />
+      <input ref="userid" />
     </dd>
   </virtual>
   <virtual if={!relation || !relation.isApplicant}>
     <dt>相手の合言葉</dt>
     <dd>
-      <input type="text" name="countersign" value={countersign} />
+      <input ref="countersign" />
     </dd>
     <dt>&nbsp;</dt>
     <dd>
@@ -39,15 +39,22 @@
   </virtual>
 </dl>
 <script>
+
+  var duties = opts.duties;
+
   this.relation = opts.schema;
-  this.duties = opts.duties;
-  this.userid;
-  this.countersign;
 
   makeRalation(event) {
+
+    var userid,
+        countersign = this.refs.userid.value;
+
     if (relation) {
-      userid = relation.userid;
+      userid = this.relation.userid;
+    } else {
+      userid = this.refs.userid.value;
     }
+
     if (!userid || !countersign) {
       alert('ユーザIDと合言葉を入力してください');
       return;
@@ -59,7 +66,7 @@
     if (!confirm('ホットラインを解消してもよいですか？')) {
       return;
     }
-    duties.breakRelation(relation.userid);
+    duties.breakRelation(this.relation.userid);
   }
 
   move(event) {
