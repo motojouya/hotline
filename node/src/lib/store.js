@@ -8,8 +8,12 @@ export default function (observable) {
   observable(config);
   observable(chats);
   
-  var getRelations = function () {
-    return relations;
+  var getRelations = function (userid) {
+    if (userid) {
+      return relations[userid];
+    } else {
+      return relations;
+    }
   };
   
   var setRelations = function (ary) {
@@ -36,14 +40,14 @@ export default function (observable) {
   
   var setConfig = function (name, obj) {
     var key;
-    if (!obj) {
-      obj = name;
+    if (obj) {
       config[name] = obj;
-    } else {
-      for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          config[key] = obj[key];
-        }
+      return;
+    }
+    obj = name;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        config[key] = obj[key];
       }
     }
   };
@@ -72,5 +76,4 @@ export default function (observable) {
     setVoices: setVoices,
   };
 }
-
 

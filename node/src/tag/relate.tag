@@ -34,7 +34,7 @@
     </dd>
     <dt>&nbsp;</dt>
     <dd>
-      <button type="button" onclick={makeRalation} />ホットライン申請</button>
+      <button type="button" onclick={makeRalation} >ホットライン申請</button>
     </dd>
   </virtual>
 </dl>

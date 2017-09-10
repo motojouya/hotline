@@ -1,11 +1,11 @@
 <menu>
 <div class="titlebar">
-  <h3 class="title">PSPS</h3>
+  <h3 class="title">hotline</h3>
   <span class="configlink"><a href="/app/config/" onclick={move}>設定</a></span>
 </div>
 <ul class="userlist">
   <li>
-    <a href="/app/relation" onclick={move}>+つながる</a>
+    <a href="/app/relation/" onclick={move}>+つながる</a>
   </li>
   <li class="relateduser" each={relationAry}>
     <a href="/app/relation/{userid}/" onclick={parent.move}>{name}</a>
@@ -29,7 +29,7 @@
     }
   }
   this.relationAry.sort(function (left, right) {
-    return left.updateAt = right.updateAt;
+    return left.updateAt - right.updateAt;
   });
 
   move(event) {

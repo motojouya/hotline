@@ -1,8 +1,8 @@
 import agent from 'superagent';
 
 var relations = [
-  {no: 1, userid: "hamada", apply: "hamada", accept: "matsumoto", status: 1, clap: "2017-07-02 10:10:10", message: "2017-07-01 12:34:56", call: "2017-06-17 11:21:45"}
- ,{no: 2, userid: "hamada", apply: "matsumoto", accept: "hamada", status: 1, clap: "2017-04-09 23:12:11", message: "2017-04-09 23:12:21", call: null}
+  {no: 1, userid: "hamada", name: "浜田", apply: "hamada", accept: "matsumoto", status: "ACTIVE", clap: "2017-07-02 10:10:10", message: "2017-07-01 12:34:56", call: "2017-06-17 11:21:45"}
+ ,{no: 2, userid: "takasu", name: "高須", apply: "matsumoto", accept: "takasu", status: "ACTIVE", clap: "2017-04-09 23:12:11", message: "2017-04-09 23:12:21", call: null}
 ];
 
 var voices = [
