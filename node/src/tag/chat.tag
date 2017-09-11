@@ -3,9 +3,9 @@
   <div>
     <span class="topback"><a href="/app/" onclick={move}>←</a></span>
     <div class="thumbnail_wrap">
-      <image src={relateduser.thumbnail} alt="サムネイル画像" />
+      <image src={relation.thumbnail} alt="サムネイル画像" />
     </div>
-    <h3 class="username">{relateduser.name}</h3>
+    <h3 class="username">{relation.name}</h3>
     <span class="configlink"><button type="button" onclick={openOptions}>*</button></span>
   </div>
   <div show={options} >
@@ -14,11 +14,8 @@
   </div>
 </div>
 <ul class="voicelist">
-  <li class="relateduser" each={voices}>
-    <span class={(parent.relateduser.userid === userid): self}>{message}<span>
-  </li>
-  <li class="relateduser" >
-    <span class={(parent.relateduser.userid === userid): self}>{pendingVoice}<span>
+  <li each={voices} class="relateduser">
+    <span class={(parent.relation.userid === userid): self}>{message}<span>
   </li>
 </ul>
 <div>
@@ -31,13 +28,12 @@
 
   this.relation = schema.relation;
   this.voices = schema.voices;
-  this.pendingVoice = null;
 
-  voices.on('change', function (){
+  this.voices.on('change', function (){
     this.update();
   });
 
-  var options = false;
+  this.options = false;
 
   speak(event) {
 
@@ -48,22 +44,20 @@
 
     event.preventDefault();
 
-    if (len > 1) {
-      for (; i < len - 1; i++) {
-        duties.sendMessage(messageLines[i], true);
-      }
-      this.refs.message.value = messageLines[len - 1];
+    for (; i < len - 1; i++) {
+      duties.sendMessage(messageLines[i], true);
     }
     if (key === 13) {
       duties.sendMessage(messageLines[len - 1], true);
       this.refs.message.value = '';
     } else {
-      this.pendingVoice.push(messageLines[len - 1]);
+      duties.sendMessage(messageLines[len - 1], false);
+      this.refs.message.value = messageLines[len - 1];
     }
   }
 
   uploadFile(event) {
-    //TODO
+    alert('TODO');
   }
 
   breakRalation(event) {
@@ -74,7 +68,7 @@
   }
 
   openOptions(event) {
-    options = !options;
+    this.options = !(this.options);
   }
 
   move(event) {

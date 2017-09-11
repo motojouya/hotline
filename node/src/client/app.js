@@ -61,13 +61,13 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       });
 
     case 'relation':
-      var relation = store.getRelations(state.relationNo);
+      var relation = store.getRelation(state.relationNo);
 
       if (relation && relation.status == 'ACTIVE') {
-        return change('chat' + state.relationNo, 'chat', {
+        return change('chat', 'chat' + state.relationNo, {
           schema: {
             relation: relation
-           ,voices: store.getVoices(relation.userid)
+           ,voices: store.getVoices(relation.relation_no)
           }
          ,duties: {
             sendMessage: sendWSMessage
@@ -188,14 +188,17 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       case 'RELATION' :
         store.setRelations(data.relations);
       case 'VOICE' :
-        store.setVoices(data.userid, data.voices);
+        store.setVoices(data.relation_no, data.voices);
       default : //do nothing
       }
     });
   };
 
-  var sendWSMessage = function (payload) {
-    wsConn.send(payload);
+  var sendWSMessage = function (message, confirm) {
+    wsConn.send({
+      message: message,
+      confirm: confirm
+    });
   };
 
   var closeWSConnection = function (code, reason) {

@@ -55,8 +55,8 @@ var getRelations = function (offset, limit, callback) {
     }).end(callback);
 };
 
-var getVoices = function (userid, offset, limit, callback) {
-  agent.get('/api/v1/voices/' + userid)
+var getVoices = function (relation_no, offset, limit, callback) {
+  agent.get('/api/v1/voices/' + relation_no)
     .query({
       offset
      ,limit

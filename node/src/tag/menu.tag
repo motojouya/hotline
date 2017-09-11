@@ -8,7 +8,7 @@
     <a href="/app/relation/" onclick={move}>+つながる</a>
   </li>
   <li class="relateduser" each={relationAry}>
-    <a href="/app/relation/{userid}/" onclick={parent.move}>{name}</a>
+    <a href="/app/relation/{relation_no}/" onclick={parent.move}>{name}</a>
   </li>
 </ul>
 <script>

@@ -7,32 +7,32 @@
   <dt>名前</dt>
   <dd>
     {configs.name}
-    <button type="button" onchange={changeName} >変更</button>
+    <button type="button" onclick={changeName} >変更</button>
   </dd>
   <dt>メールアドレス</dt>
   <dd>
     {configs.email}
-    <button type="button" onchange={changeEmail} >変更</button>
+    <button type="button" onclick={changeEmail} >変更</button>
   </dd>
   <dt>サムネイル画像</dt>
   <dd>
     <div class="thumbnail_wrap">
       <image src={configs.thumbnail} alt="thumbnail image" />
     </div>
-    <input type="file" class="thumbnail" onchange={changeThumbnail}/>
+    <input type="file" class="thumbnail" onclick={changeThumbnail}/>
   </dd>
   <dt>ログインパスワード</dt>
   <dd>
-    <button type="button" onchange={changeLoginPassword} >変更</button>
+    <button type="button" onclick={changeLoginPassword} >変更</button>
   </dd>
   <dt>合言葉</dt>
   <dd>
     {configs.countersign}
-    <button type="button" onchange={changeCountersign} >変更</button>
+    <button type="button" onclick={changeCountersign} >変更</button>
   </dd>
   <dt>テーマカラー</dt>
-  <dd>
-    <input type="range" style="background-color:{themeColor}" value={configs.color} max="63" onchange={changeColor}/>
+  <dd style="background-color:{themeColor}">
+    <input type="range" value={configs.color} max="63" onchange={changeColor}/>
   </dd>
   <dt>通知</dt>
   <dd>
@@ -56,20 +56,20 @@
       duties = opts.duties;
 
   var serializeColor = function (colorNumber) {
-    return '333';
+    return '4169e1';
   };
   var deserializeColor = function (rgbCode) {
     return 20;
   };
 
   this.configs = opts.schema;
-  this.themeColor = null;
+  this.themeColor = '#' + serializeColor(this.configs.colorNumber);
 
   changeColor(event) {
     var reservation = reserveChangeConfig['color']
       , colorNumber = event.target.value;
 
-    this.themeColor = serializeColor(colorNumber);
+    this.themeColor = '#' + serializeColor(colorNumber);
 
     if (reservation) {
       canselTimeout(reservation);

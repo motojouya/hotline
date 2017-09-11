@@ -12,14 +12,12 @@
     <dd>{relation.userid}</dd>
     <dt>相手の名前</dt>
     <dd>{relation.name}</dd>
-    <virtual if={relation.isApplicant}>
-      <dt>ステータス</dt>
-      <dd>申請中</dd>
-      <dt>&nbsp;</dt>
-      <dd>
-        <button type="button" onclick={breakRalation} />申請を取りやめる</button>
-      </dd>
-    </virtual>
+    <dt>ステータス</dt>
+    <dd>申請中</dd>
+    <dt>&nbsp;</dt>
+    <dd>
+      <button type="button" onclick={breakRalation} >申請削除</button>
+    </dd>
   </virtual>
   <virtual if={!relation}>
     <dt>相手のID</dt>
@@ -27,7 +25,7 @@
       <input ref="userid" />
     </dd>
   </virtual>
-  <virtual if={!relation || !relation.isApplicant}>
+  <virtual if={!relation || !relation.is_applicant}>
     <dt>相手の合言葉</dt>
     <dd>
       <input ref="countersign" />
@@ -47,9 +45,9 @@
   makeRalation(event) {
 
     var userid,
-        countersign = this.refs.userid.value;
+        countersign = this.refs.countersign.value;
 
-    if (relation) {
+    if (this.relation) {
       userid = this.relation.userid;
     } else {
       userid = this.refs.userid.value;

@@ -6,31 +6,36 @@ export default function (observable) {
   
   observable(relations);
   observable(config);
-  observable(chats);
   
-  var getRelations = function (userid) {
-    if (userid) {
-      return relations[userid];
-    } else {
-      return relations;
-    }
+  var getRelations = function () {
+    return relations;
+  };
+  
+  var getRelation = function (relation_no) {
+    return relations[relation_no];
   };
   
   var setRelations = function (ary) {
-    var i = 0
-      , len = ary.length
-      , relation
-      , key
-      , obj;
+    var i = 0,
+        len = ary.length,
+        relation,
+        key,
+        obj;
     for (; i < len; i++) {
       obj = ary[i];
-      relation = relations[obj.userid] || {};
+      if (relations[obj.relation_no]) {
+        relation = relations[obj.relation_no];
+      } else {
+        relation = {};
+        observable(relation);
+      }
+
       for (key in obj) {
         if (obj.hasOwnProperty(key)) {
           relation[key] = obj[key];
         }
       }
-      relations[obj.userid] = relation;
+      relations[obj.relation_no] = relation;
     }
   };
   
@@ -52,23 +57,38 @@ export default function (observable) {
     }
   };
   
-  var getVoices = function (userid) {
-    chats[userid] = chats[userid] || new VoiceCollection();
-    return chats[userid];
+  var getVoices = function (relation_no) {
+    var voices;
+    if (chats[relation_no]) {
+      voices = chats[relation_no];
+    } else {
+      voices = [];
+      observable(voices);
+    }
+    return voices;
   };
   
-  var setVoices = function (userid, ary) {
-    var voices = chats[userid] || new VoiceCollection()
-      , i = 0
-      , len = ary.length;
+  var setVoices = function (relation_no, ary) {
+    var voices,
+        i = 0,
+        len = ary.length;
+
+    if (chats[relation_no]) {
+      voices = chats[relation_no];
+    } else {
+      voices = [];
+      observable(voices);
+    }
+
     for (; i < len; i++) {
       voices.add(ary[i]);
     }
-    return chats[userid] = voices;
+    return chats[relation_no] = voices;
   };
   
   return {
     getRelations: getRelations,
+    getRelation: getRelation,
     setRelations: setRelations,
     getConfig: getConfig,
     setConfig: setConfig,
