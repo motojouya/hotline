@@ -104,8 +104,8 @@ var _store2 = _interopRequireDefault(_store);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 window.addEventListener('DOMContentLoaded', function (event) {
-  var mainTag = document.getElementById('main');
-  (0, _app2.default)(window, document, history, location, _xhr_mock2.default, _store2.default, mainTag, riot, function (isPause) {
+  var bodyTag = document.getElementById('body');
+  (0, _app2.default)(window, document, history, location, _xhr_mock2.default, _store2.default, bodyTag, riot, function (isPause) {
     var loadingClasses = document.getElementById('loading').classList;
     if (isPause) {
       loadingClasses.remove('invisible');
@@ -126,7 +126,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-exports.default = function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pause) {
+exports.default = function (win, doc, hstry, loc, xhr, getStore, bodyTag, riot, pause) {
 
   var relation_request_size = 20;
   var voice_request_size = 100;
@@ -143,8 +143,8 @@ exports.default = function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, 
 
   var change = function change(tagName, tagId, opts) {
 
-    var div = doc.createElement('div'),
-        tag = doc.createElement('menu'),
+    var section = doc.createElement('section'),
+        tag = doc.createElement(tagName),
         script = doc.createElement('script');
 
     for (var key in domItems) {
@@ -160,12 +160,12 @@ exports.default = function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, 
       pause(false);
     };
     script.src = '/app/tag/' + tagName + '.js';
-    div.appendChild(script);
-    div.appendChild(tag);
-    div.setAttribute('id', tagId);
+    section.appendChild(script);
+    section.appendChild(tag);
+    section.setAttribute('id', tagId);
 
-    mainTag.appendChild(div);
-    domItems[tagId] = div;
+    bodyTag.appendChild(section);
+    domItems[tagId] = section;
   };
 
   var changeState = function changeState(state) {

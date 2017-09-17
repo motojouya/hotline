@@ -1,55 +1,61 @@
 <config>
-<div class="titlebar">
-  <span class="topback"><a href="/app/" onclick={move}>←</a></span>
-  <h3 class="title">Hotline</h3>
-</div>
-<dl class="configs">
-  <dt>名前</dt>
-  <dd>
-    {configs.name}
-    <button type="button" onclick={changeName} >変更</button>
-  </dd>
-  <dt>メールアドレス</dt>
-  <dd>
-    {configs.email}
-    <button type="button" onclick={changeEmail} >変更</button>
-  </dd>
-  <dt>サムネイル画像</dt>
-  <dd>
-    <div class="thumbnail_wrap">
-      <image src={configs.thumbnail} alt="thumbnail image" />
-    </div>
-    <input type="file" class="thumbnail" onclick={changeThumbnail}/>
-  </dd>
-  <dt>ログインパスワード</dt>
-  <dd>
-    <button type="button" onclick={changeLoginPassword} >変更</button>
-  </dd>
-  <dt>合言葉</dt>
-  <dd>
-    {configs.countersign}
-    <button type="button" onclick={changeCountersign} >変更</button>
-  </dd>
-  <dt>テーマカラー</dt>
-  <dd style="background-color:{themeColor}">
-    <input type="range" value={configs.color} max="63" onchange={changeColor}/>
-  </dd>
-  <dt>通知</dt>
-  <dd>
-    <label for="notification_none" >
-      <input type="radio" value="0" name="notification" onchange={changeNotification} id="notification_none" />
-      通知しない
-    </label>
-    <label for="notification_first" >
-      <input type="radio" value="1" name="notification" onchange={changeNotification} id="notification_first" />
-      最初の1回のみ
-    </label>
-    <label for="notification_always" >
-      <input type="radio" value="2" name="notification" onchange={changeNotification} id="notification_always" />
-      常に通知
-    </label>
-  </dd>
-</dl>
+<header class="invert buoyed flex">
+  <div class="fixeditem">
+    <a href="/app/" onclick={move} class="top_back">
+      <span class="back_button"></span>
+    </a>
+  </div>
+  <h1 class="sentence variableitem">hotline</h1>
+</header>
+<main>
+  <dl class="configs">
+    <dt>名前</dt>
+    <dd>
+      {configs.name}
+      <button type="button" onclick={changeName} >変更</button>
+    </dd>
+    <dt>メールアドレス</dt>
+    <dd>
+      {configs.email}
+      <button type="button" onclick={changeEmail} >変更</button>
+    </dd>
+    <dt>サムネイル画像</dt>
+    <dd>
+      <div class="thumbnail_wrap">
+        <image src={configs.thumbnail} alt="thumbnail image" />
+      </div>
+      <input type="file" class="thumbnail" onclick={changeThumbnail}/>
+    </dd>
+    <dt>ログインパスワード</dt>
+    <dd>
+      <button type="button" onclick={changeLoginPassword} >変更</button>
+    </dd>
+    <dt>合言葉</dt>
+    <dd>
+      {configs.countersign}
+      <button type="button" onclick={changeCountersign} >変更</button>
+    </dd>
+    <dt>テーマカラー</dt>
+    <dd style="background-color:{themeColor}">
+      <input type="range" value={configs.color} max="63" onchange={changeColor}/>
+    </dd>
+    <dt>通知</dt>
+    <dd>
+      <label for="notification_none" >
+        <input type="radio" value="0" name="notification" onchange={changeNotification} id="notification_none" />
+        通知しない
+      </label>
+      <label for="notification_first" >
+        <input type="radio" value="1" name="notification" onchange={changeNotification} id="notification_first" />
+        最初の1回のみ
+      </label>
+      <label for="notification_always" >
+        <input type="radio" value="2" name="notification" onchange={changeNotification} id="notification_always" />
+        常に通知
+      </label>
+    </dd>
+  </dl>
+</main>
 <script>
 
   var reserveChangeConfig = {},
@@ -144,7 +150,7 @@
 
   move(event) {
     event.preventDefault();
-    duties.transfer(event.target.pathname);
+    duties.transfer(event.currentTarget.pathname);
   }
 </script>
 <style>

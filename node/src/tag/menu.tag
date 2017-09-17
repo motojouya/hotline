@@ -1,16 +1,32 @@
 <menu>
-<div class="titlebar">
-  <h3 class="title">hotline</h3>
-  <span class="configlink"><a href="/app/config/" onclick={move}>設定</a></span>
-</div>
-<ul class="userlist">
-  <li>
-    <a href="/app/relation/" onclick={move}>+つながる</a>
-  </li>
-  <li class="relateduser" each={relationAry}>
-    <a href="/app/relation/{relation_no}/" onclick={parent.move}>{name}</a>
-  </li>
-</ul>
+<header class="invert buoyed flex">
+  <h1 class="sentence variableitem">hotline</h1>
+  <div class="fixeditem">
+    <a href="/app/config/" onclick={move}>
+      <span>設定</span>
+    </a>
+  </div>
+</header>
+<main>
+  <ul class="relation_list">
+    <li>
+      <a href="/app/relation/" onclick={move} class="flex">
+        <img src="/app/img/test.jpg" alt={name} class="thumb circle fixeditem">
+        <div class="variableitem">
+          <span class="link_text">つながる</span>
+        </div>
+      </a>
+    </li>
+    <li each={relationAry}>
+      <a href="/app/relation/{relation_no}/" onclick={parent.move} class="flex">
+        <img src="/app/img/test.jpg" alt={name} class="thumb circle fixeditem">
+        <div class="variableitem">
+          <span class="link_text">{name}</span>
+        </div>
+      </a>
+    </li>
+  </ul>
+</main>
 <script>
 
   var relationMap = opts.schema
@@ -34,21 +50,21 @@
 
   move(event) {
     event.preventDefault();
-    duties.transfer(event.target.pathname);
+    duties.transfer(event.currentTarget.pathname);
   }
 </script>
 <style>
-  .titlebar {
+  ul.relation_list > li {
+    margin: 10px 0 0 10px;
   }
-  .title {
-    display: inline-block;
+  .link_text {
+    margin: 0 0 0 10px;
+    line-height: 70px;
+    vertical-align: middle;
   }
-  .configlink {
-  }
-  .userlist {
-    list-style: none;
-  }
-  .relateduser {
+  .thumb {
+    height: 70px;
+    weight: 70px;
   }
 </style>
 </menu>

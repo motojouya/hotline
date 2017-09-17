@@ -1,4 +1,4 @@
-export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pause) {
+export default function (win, doc, hstry, loc, xhr, getStore, bodyTag, riot, pause) {
 
   const relation_request_size = 20;
   const voice_request_size = 100;
@@ -15,8 +15,8 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
 
   var change = function (tagName, tagId, opts) {
 
-    var div = doc.createElement('div')
-      , tag = doc.createElement('menu')
+    var section = doc.createElement('section')
+      , tag = doc.createElement(tagName)
       , script = doc.createElement('script');
 
     for (var key in domItems) {
@@ -32,12 +32,12 @@ export default function (win, doc, hstry, loc, xhr, getStore, mainTag, riot, pau
       pause(false);
     };
     script.src = '/app/tag/' + tagName + '.js';
-    div.appendChild(script);
-    div.appendChild(tag);
-    div.setAttribute('id', tagId);
+    section.appendChild(script);
+    section.appendChild(tag);
+    section.setAttribute('id', tagId);
 
-    mainTag.appendChild(div);
-    domItems[tagId] = div;
+    bodyTag.appendChild(section);
+    domItems[tagId] = section;
   };
 
   var changeState = function (state) {

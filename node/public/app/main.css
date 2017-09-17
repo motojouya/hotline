@@ -1,0 +1,95 @@
+body {
+  margin: 0;
+  font-family: "游ゴシック体", "Yu Gothic", YuGothic, "メイリオ", Meiryo, "ヒラギノ角ゴシック", "Hiragino Kaku Gothic", Osaka, arial, "Helvetica Neue", helvetica, "MS PGothic", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.2em;
+  line-height: 1.5em;
+  width: 100%;
+  /* max-width: 768px; */
+  background-color: whitesmoke;
+  color: black;
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+a {
+  text-decoration: none;
+}
+.flex {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+.fixeditem {
+  flex-grow: 0;
+  flex-shrink: 0;
+  position: relative;
+  display: inline-flex;
+}
+.variableitem {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+  position: relative;
+  display: inline-flex;
+}
+.fcol {
+  flex-direction: column;
+  height: 100%;
+}
+.buoyed {
+  box-shadow: 2px 2px 2px 0px black;
+  z-index: 10;
+  /* background-color: white; */
+}
+.invert {
+  background-color: darkturquoise;
+  color: white;
+}
+.sentence {
+  margin: 5px;
+}
+.circle {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  border-radius: 50%;
+}
+.invisible {
+  display: none;
+}
+.ablock {
+  display: inline-block;
+}
+.top_back {
+  width: 25px;
+}
+.back_button {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  height: 10px;
+  width: 10px;
+  border: 2px solid white;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+.box {
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  -o-box-align: center;
+  -ms-box-align: center;
+  box-align: center;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -o-box;
+  display: -ms-box;
+  display: box;
+}

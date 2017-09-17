@@ -8,9 +8,10 @@ RUN export DEBIAN_FRONTEND=noninteractive LANG && \
     locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8
 
-ENV LANG en_US.UTF-8 \
-    LANGUAGE en_US.UTF-8 \
-    NODE_PATH /usr/local/lib/node_modules
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    NODE_PATH=/usr/local/lib/node_modules
 
 RUN apt-get install -y vim && \
     npm install -g riot && \
