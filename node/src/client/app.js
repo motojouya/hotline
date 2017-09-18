@@ -165,7 +165,7 @@ export default function (win, doc, hstry, loc, xhr, getStore, bodyTag, riot, pau
         return;
       }
       data = res.payload;
-      store.setRelation([data]);
+      store.setRelations([data]);
     });
   };
 
@@ -176,7 +176,7 @@ export default function (win, doc, hstry, loc, xhr, getStore, bodyTag, riot, pau
         return;
       }
       data = res.payload;
-      store.setRelation([data]);
+      store.setRelations([data]);
     });
   };
 

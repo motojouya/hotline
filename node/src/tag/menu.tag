@@ -11,7 +11,7 @@
   <ul class="relation_list">
     <li>
       <a href="/app/relation/" onclick={move} class="flex">
-        <img src="/app/img/test.jpg" alt={name} class="thumb circle fixeditem">
+        <img src="/app/img/test.jpg" alt={name} class="thumbnail circle fixeditem">
         <div class="variableitem">
           <span class="link_text">つながる</span>
         </div>
@@ -19,7 +19,7 @@
     </li>
     <li each={relationAry}>
       <a href="/app/relation/{relation_no}/" onclick={parent.move} class="flex">
-        <img src="/app/img/test.jpg" alt={name} class="thumb circle fixeditem">
+        <img src="/app/img/test.jpg" alt={name} class="thumbnail circle fixeditem">
         <div class="variableitem">
           <span class="link_text">{name}</span>
         </div>
@@ -62,9 +62,9 @@
     line-height: 70px;
     vertical-align: middle;
   }
-  .thumb {
+  .thumbnail {
     height: 70px;
-    weight: 70px;
+    width: 70px;
   }
 </style>
 </menu>

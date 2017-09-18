@@ -66,7 +66,7 @@ var getConfig = function (callback) {
       email: 'test@gmail.com',
       countersign: 'peru',
       colorNumber: 4,
-      thumbnail: 'test.png',
+      thumbnail: '/app/img/test.jpg',
       notification: 0,
     }
   });

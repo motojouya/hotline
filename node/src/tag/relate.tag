@@ -1,41 +1,77 @@
 <relate>
-<div class="titlebar">
-  <span class="topback"><a href="/app/" onclick={move}>←</a></span>
-  <h3 class="title">Hotline</h3>
-</div>
-<div>
-  {subscription}
-<div>
-<dl class="configs">
-  <virtual if={relation}>
-    <dt>相手のID</dt>
-    <dd>{relation.userid}</dd>
-    <dt>相手の名前</dt>
-    <dd>{relation.name}</dd>
-    <dt>ステータス</dt>
-    <dd>申請中</dd>
-    <dt>&nbsp;</dt>
+<header class="invert buoyed flex">
+  <div class="fixeditem">
+    <a href="/app/" onclick={move} class="top_back">
+      <span class="back_button"></span>
+    </a>
+  </div>
+  <h1 class="sentence variableitem">hotline</h1>
+</header>
+<main>
+  <div>
+    {subscription}
+  <div>
+  <dl class="def">
+    <virtual if={relation}>
+      <dt class="flex">
+        <div class="term fixeditem">相手のID</div>
+        <div class="above_line variableitem"></div>
+        <div class="edit fixeditem"></div>
+      </dt>
+      <dd>
+        <span>{relation.userid}</span>
+      </dd>
+      <dt class="flex">
+        <div class="term fixeditem">相手の名前</div>
+        <div class="above_line variableitem"></div>
+        <div class="edit fixeditem"></div>
+      </dt>
+      <dd>
+        <span>{relation.name}</span>
+      </dd>
+      <dt class="flex">
+        <div class="term fixeditem">ステータス</div>
+        <div class="above_line variableitem"></div>
+        <div class="edit fixeditem"></div>
+      </dt>
+      <dd>
+        <span>申請中</span>
+      </dd>
+    </virtual>
+    <virtual if={!relation}>
+      <dt class="flex">
+        <div class="term fixeditem">相手のID</div>
+        <div class="above_line variableitem"></div>
+        <div class="edit fixeditem"></div>
+      </dt>
+      <dd>
+        <div class="text_wrap">
+          <input type="text" class="modal_input" ref="userid" />
+        </div>
+      </dd>
+    </virtual>
+    <virtual if={!relation || !relation.is_applicant}>
+      <dt class="flex">
+        <div class="term fixeditem">相手の合言葉</div>
+        <div class="above_line variableitem"></div>
+        <div class="edit fixeditem"></div>
+      </dt>
+      <dd>
+        <div class="text_wrap">
+          <input type="text" class="modal_input" ref="countersign" />
+        </div>
+      </dd>
+    </virtual>
     <dd>
-      <button type="button" onclick={breakRalation} >申請削除</button>
+      <virtual if={relation}>
+        <button type="button" onclick={breakRalation} >申請削除</button>
+      </virtual>
+      <virtual if={!relation || !relation.is_applicant}>
+        <button type="button" onclick={makeRalation} >ホットライン申請</button>
+      </virtual>
     </dd>
-  </virtual>
-  <virtual if={!relation}>
-    <dt>相手のID</dt>
-    <dd>
-      <input ref="userid" />
-    </dd>
-  </virtual>
-  <virtual if={!relation || !relation.is_applicant}>
-    <dt>相手の合言葉</dt>
-    <dd>
-      <input ref="countersign" />
-    </dd>
-    <dt>&nbsp;</dt>
-    <dd>
-      <button type="button" onclick={makeRalation} >ホットライン申請</button>
-    </dd>
-  </virtual>
-</dl>
+  </dl>
+</main>
 <script>
 
   var duties = opts.duties;
@@ -69,30 +105,9 @@
 
   move(event) {
     event.preventDefault();
-    duties.transfer(event.target.pathname);
+    duties.transfer(event.currentTarget.pathname);
   }
 </script>
 <style>
-  .titlebar {
-  }
-  .title {
-    display: inline-block;
-  }
-  .topback {
-  }
-  .configs {
-    list-style: none;
-  }
-  .relateduser {
-  }
-  .thumbnail_wrap {
-    background-image: (default_thumbnail.png);
-    z-index: 1;
-  }
-  .thumbnail_wrap image {
-    z-index: 10;
-  }
-  .thumbnail {
-  }
 </style>
 </relate>
