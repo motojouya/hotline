@@ -6,19 +6,51 @@
 </head>
 
 <body id="body">
-  <section id="loading" class="loading">
+  <section id="loading">
+    <header class="invert buoyed flex">
+      <h1 class="sentence variableitem">hotline</h1>
+    </header>
+    <main>
+      <div class="loading_wrap">
+        <div class="loading">
+          <div class="swing_wrap flex">
+            <div class="swing fixeditem">
+              <div class="point"></div>
+            </div>
+            <div class="swing fixeditem">
+              <div class="point"></div>
+            </div>
+            <div class="swing fixeditem">
+              <div class="point"></div>
+            </div>
+          </div>
+          <div class="load_text_wrap flex">
+            <div class="load_text fixeditem">
+              <span class="load_text_letter">読</span>
+            </div>
+            <div class="load_text fixeditem">
+              <span class="load_text_letter">込</span>
+            </div>
+            <div class="load_text fixeditem">
+              <span class="load_text_letter">中</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+  <section id="error" class="invisible">
     <header class="invert buoyed flex">
       <h1 class="sentence variableitem">hotline</h1>
     </header>
     <main>
       <div>
-        <span class="rotate">読</span>
-        <span class="rotate">込</span>
-        <span class="rotate">中</span>
+        <span>ネットワークにつながりません</span>
       </div>
     </main>
   </section>
-  <script src="https://cdn.jsdelivr.net/npm/riot@3.7/riot.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/riot@3.7/riot.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/riot-route@3.1.2/dist/route.js"></script>
   <script src="./bundle.js" ></script>
 </body>
 </html>

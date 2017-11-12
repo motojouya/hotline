@@ -19,7 +19,7 @@
     </li>
     <li each={relationAry}>
       <a href="/app/relation/{relation_no}/" onclick={parent.move} class="flex">
-        <img src="/app/img/test.jpg" alt={name} class="thumbnail circle fixeditem">
+        <img src={thumbnail} alt={name} class="thumbnail circle fixeditem">
         <div class="variableitem">
           <span class="link_text">{name}</span>
         </div>
@@ -29,14 +29,15 @@
 </main>
 <script>
 
-  var relationMap = opts.schema
-    , duties = opts.duties
-    , key;
+  var relationMap = opts.schema,
+      duties = opts.duties,
+      key,
+      that = this;
 
   this.relationAry = []
 
   relationMap.on('change', function (){
-    this.update();
+    that.update();
   });
 
   for (key in relationMap) {
@@ -65,6 +66,10 @@
   .thumbnail {
     height: 70px;
     width: 70px;
+  }
+  menu {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
   }
 </style>
 </menu>

@@ -8,9 +8,7 @@
   <h1 class="sentence variableitem">hotline</h1>
 </header>
 <main>
-  <div>
-    {subscription}
-  <div>
+  <div>{subscription}<div>
   <dl class="def">
     <virtual if={relation}>
       <dt class="flex">
@@ -109,5 +107,9 @@
   }
 </script>
 <style>
+  relate {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+  }
 </style>
 </relate>

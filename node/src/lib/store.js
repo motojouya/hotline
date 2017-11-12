@@ -56,7 +56,7 @@ export default function (observable) {
       }
     }
   };
-  
+ 
   var getVoices = function (relation_no) {
     var voices;
     if (chats[relation_no]) {

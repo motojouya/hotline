@@ -138,48 +138,7 @@
 <script>
 
   var reserveChangeConfig = {},
-      duties = opts.duties,
-      colorNumberBase = 7,
-      colorNumberRange = 8;
-
-  var serializeColor = function (colorNumber) {
-
-    if (isNaN(colorNumber) || colorNumber.length > 2 || colorNumber.length < 1 || colorNumber < 0 || colorNumber > 23) {
-      return '4169e1';
-    }
-
-    var colorInt = parseInt(colorNumber),
-        area = Math.floor(colorInt / colorNumberRange),
-        value = colorInt % colorNumberRange;
-
-    switch (area) {
-    case 0:
-      return colorNumberBase + '' + calcColorElement(value) + '' + calcColorElement(colorNumberRange - (1 + value));
-    case 1:
-      return calcColorElement(value) + '' + calcColorElement(colorNumberRange - (1 + value)) + '' + colorNumberBase;
-    case 2:
-      return calcColorElement(colorNumberRange - (1 + value)) + '' + colorNumberBase + '' + calcColorElement(value);
-    default:
-      return '4169e1';
-    }
-  };
-
-  var calcColorElement = function (number) {
-    switch (number) {
-    case 7:
-      return 'e';
-    case 6:
-      return 'd';
-    case 5:
-      return 'c';
-    case 4:
-      return 'b';
-    case 3:
-      return 'a';
-    default :
-      return number + colorNumberBase;
-    }
-  };
+      duties = opts.duties;
 
   var closeModals = function (modals, configName, newValue) {
     modals.inputText = false;
@@ -191,7 +150,7 @@
   };
 
   this.configs = opts.schema;
-  this.themeColor = '#' + serializeColor(this.configs.colorNumber);
+  this.themeColor = '#' + duties.serializeColor(this.configs.colorNumber);
   this.configName = null;
   this.newValue = null;
   this.modals = {};
@@ -224,38 +183,38 @@
     closeModals(this.modals, this.configName, this.newValue);
     switch (this.configName) {
     case '名前':
-      duties.changeConfig({name: this.refs.input_text.value});
+      duties.changer.changeConfig({name: this.refs.input_text.value});
       break;
     case 'E-MAIL':
-      duties.changeConfig({email: this.refs.input_text.value});
+      duties.changer.changeConfig({email: this.refs.input_text.value});
       break;
     case 'ユーザID':
-      duties.changeConfig({userid: this.refs.input_text.value});
+      duties.changer.changeConfig({userid: this.refs.input_text.value});
       break;
     case '合言葉':
-      duties.changeConfig({countersign: this.refs.input_text.value});
+      duties.changer.changeConfig({countersign: this.refs.input_text.value});
       break;
     case 'PASSWORD':
-      duties.configLoginPassword(this.refs.old_password.value, this.refs.new_password.value);
+      duties.changer.configLoginPassword(this.refs.old_password.value, this.refs.new_password.value);
       break;
     }
   }
 
   previewColor(event) {
-    this.themeColor = '#' + serializeColor(event.currentTarget.value);
+    this.themeColor = '#' + duties.serializeColor(event.currentTarget.value);
   }
 
   changeColor(event) {
     var reservation = reserveChangeConfig['color']
       , colorNumber = event.currentTarget.value;
 
-    this.themeColor = '#' + serializeColor(colorNumber);
+    this.themeColor = '#' + duties.serializeColor(colorNumber);
 
     if (reservation) {
       canselTimeout(reservation);
     }
     setTimeout(function () {
-      duties.changeConfig({colorNumber: colorNumber});
+      duties.changer.changeConfig({colorNumber: colorNumber});
     }, 1000);
   }
 
@@ -266,7 +225,7 @@
       canselTimeout(reservation);
     }
     setTimeout(function () {
-      duties.configThumbnail(thumbnail);
+      duties.changer.configThumbnail(thumbnail);
     }, 1000);
   }
 
@@ -291,7 +250,7 @@
       canselTimeout(reservation);
     }
     setTimeout(function () {
-      duties.changeConfig({notification: notification});
+      duties.changer.changeConfig({notification: notification});
     }, 1000);
   }
 
@@ -331,6 +290,10 @@
     position: absolute;
     bottom: 0;
     right: 0;
+  }
+  config {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
   }
 </style>
 </config>
