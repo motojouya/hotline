@@ -22,6 +22,7 @@ RUN apt-get install -y vim && \
     npm install -g less && \
     npm install -g webpack && \
     npm install -g eslint && \
+    npm install -g karma
     npm install -g mocha
 
 WORKDIR /usr/local/src/hotline

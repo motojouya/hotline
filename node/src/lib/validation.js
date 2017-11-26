@@ -1,6 +1,6 @@
 
 const isAllASCII = (str) => {
-  if (str) {
+  if (!str) {
     return true;
   }
   if(str.match(/^[\x20-\x7e]*$/)){

@@ -29,6 +29,7 @@
     "babel-preset-es2015-riot": "^1.1.0",
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
+    "karma": "^1.7.1",
     "riot": "^3.6.3",
     "uglify-js": "^3.0.28",
     "less": "^2.7.2",

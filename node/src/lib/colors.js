@@ -22,7 +22,7 @@ var calcColorElement = function (number) {
 export default function (colorNumber) {
 
   if (isNaN(colorNumber) || colorNumber.length > 2 || colorNumber.length < 1 || colorNumber < 0 || colorNumber > 23) {
-    return '4169e1';
+    return '77e';
   }
   
   var colorInt = parseInt(colorNumber),
@@ -37,7 +37,7 @@ export default function (colorNumber) {
   case 2:
     return calcColorElement(colorNumberRange - (1 + value)) + '' + colorNumberBase + '' + calcColorElement(value);
   default:
-    return '4169e1';
+    return '77e';
   }
 };
 
