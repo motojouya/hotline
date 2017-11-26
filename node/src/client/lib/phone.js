@@ -53,7 +53,7 @@ export default function (ws) {
     }
   };
 
-  ws.onReceice('CALL', 'uniqueReceiver', function (data) {
+  ws.onReceive('CALL', 'uniqueReceiver', function (data) {
 
     if (phone.state === 'WAITING' && !peerConn) {
       phone.userid = data.userid;
@@ -66,15 +66,15 @@ export default function (ws) {
       phone.changeState('SPEAKING');
 
     } else {
-      ws.sendMessage('CALLOFF', phone.userid, 'this phone is busy.');
+      ws.sendMessage('HUNGUP', phone.userid, 'this phone is busy.');
     }
   });
 
-  ws.onReceice('ICE', 'uniqueReceiver', function (message) {
-    peerConn.addIceCandidate(cadidate);
+  ws.onReceive('ICE', 'uniqueReceiver', function (message) {
+    peerConn.addIceCandidate(message.cadidate);
   });
 
-  ws.onReceice('CALLOFF', 'uniqueReceiver', function (message) {
+  ws.onReceive('HUNGUP', 'uniqueReceiver', function (message) {
     peerConn = null;
     phone.changeState('WAITING');
   });
@@ -115,7 +115,7 @@ export default function (ws) {
 
   phone.hangUp = function () {
     if (phone.state !== 'WAITING') {
-      ws.sendMessage('CALLOFF', phone.userid, 'bye!');
+      ws.sendMessage('HUNGUP', phone.userid, 'bye!');
       peerConn = null;
       phone.changeState('WAITING');
     }

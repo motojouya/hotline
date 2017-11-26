@@ -1,0 +1,34 @@
+version: '2'
+
+services:
+    test:
+        depends_on:
+            - rdb
+            - app
+        build: "./test"
+        volumes:
+            - "/home/docker/dev/test:/usr/local/src/test"
+        links:
+            - rdb
+            - app
+    app:
+        depends_on:
+            - rdb
+        build: "./node"
+        ports:
+            - "8080:3000"
+        volumes:
+            - "/home/docker/dev/node:/usr/local/src/hotline"
+        links:
+            - rdb
+    rdb:
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: hotline
+        ports:
+            - "5432:5432"
+        volumes:
+            - "./rdb:/docker-entrypoint-initdb.d"
+

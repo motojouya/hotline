@@ -13,16 +13,15 @@ ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     NODE_PATH=/usr/local/lib/node_modules
 
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb http://dl.google.com/linux/chrome/deb/ stable main " >> /etc/apt/sources.list.d/google.list && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable
+
 RUN apt-get install -y vim && \
-    npm install -g riot && \
-    npm install -g pm2 && \
-    npm install -g babel-cli && \
-    npm install -g babel-core && \
-    npm install -g uglify-js && \
-    npm install -g less && \
-    npm install -g webpack && \
-    npm install -g eslint && \
+    npm install -g webdriverio && \
+    npm install -g selenium-standalone && \
     npm install -g mocha
 
-WORKDIR /usr/local/src/hotline
+WORKDIR /usr/local/src/test
 

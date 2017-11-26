@@ -20,7 +20,7 @@ CREATE TABLE users (
 , countersign VARCHAR(16) NOT NULL
 , active BOOLEAN NOT NULL DEFAULT FALSE
 , color CHAR(3) NOT NULL
-, notification INTEGER NOT NULL DEFAULT 1
+, notification VARCHAR(8) NOT NULL DEFAULT 'UNLESS'
 , registered_at TIMESTAMP NOT NULL DEFAULT NOW()
 , thumbnail INTEGER NOT NULL
 , CONSTRAINT users_pkey PRIMARY KEY (id)
@@ -42,6 +42,7 @@ CREATE TABLE auth (
   userid VARCHAR(16) NOT NULL
 , password VARCHAR(16) NOT NULL
 , onetime_password VARCHAR(16) NOT NULL
+, registered BOOLEAN NOT NULL DEFAULT FALSE
 , registered_at TIMESTAMP NOT NULL DEFAULT NOW()
 , CONSTRAINT auth_pkey PRIMARY KEY (userid)
 , CONSTRAINT id FOREIGN KEY users(userid)
@@ -68,7 +69,7 @@ INSERT INTO relation_status (status   ,description)
 
 CREATE TABLE relations (
   relation_no SERIAL NOT NULL
-, status INTEGER NOT NULL
+, status VARCHAR(8) NOT NULL
 , applied_at TIMESTAMP NOT NULL DEFAULT NOW()
 , accepted_at TIMESTAMP NOT NULL DEFAULT NOW()
 , CONSTRAINT relations_pkey PRIMARY KEY (no)
@@ -83,7 +84,7 @@ COMMENT ON COLUMN relations.accepted_at IS 'つながりを受付た時間';
 CREATE TABLE relation_user (
   relation_no SERIAL NOT NULL
 , userid VARCHAR(16) NOT NULL
-, is_applicant BOOLEAN
+, is_applicant BOOLEAN NOT NULL
 , CONSTRAINT relation_user_pkey PRIMARY KEY (relation_no, userid)
 , CONSTRAINT no FOREIGN KEY relations(relation_no)
 , CONSTRAINT userid FOREIGN KEY users(userid)
@@ -118,4 +119,19 @@ CREATE TABLE files (
 COMMENT ON TABLE files IS 'ファイル管理テーブル';
 COMMENT ON COLUMN files.file_no IS 'ファイルno';
 COMMENT ON COLUMN files.file IS 'ファイル';
+
+CREATE TABLE user_webpush (
+, userid VARCHAR(16) NOT NULL
+, endpoint TEXT NOT NULL
+, p256dh TEXT NOT NULL
+, auth TEXT NOT NULL
+, CONSTRAINT user_webpush_pkey PRIMARY KEY (userid, endpoint)
+, CONSTRAINT userid FOREIGN KEY users(userid)
+);
+
+COMMENT ON TABLE user_webpush IS 'ユーザのwebpush通知情報';
+COMMENT ON COLUMN user_webpush.userid IS 'ユーザID';
+COMMENT ON COLUMN user_webpush.endpoint IS '通知先';
+COMMENT ON COLUMN user_webpush.p256dh IS 'p256dh';
+COMMENT ON COLUMN user_webpush.auth IS 'credencial';
 

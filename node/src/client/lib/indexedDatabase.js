@@ -1,0 +1,177 @@
+
+const indexedDB = self.indexedDB || self.mozIndexedDB || self.webkitIndexedDB || self.msIndexedDB;
+const IDBTransaction = self.IDBTransaction || self.webkitIDBTransaction || self.msIDBTransaction || {READ_WRITE: "readwrite"};
+const IDBKeyRange = self.IDBKeyRange || self.webkitIDBKeyRange || self.msIDBKeyRange;
+
+const VERSION = 1;
+const DB_NAME = 'hostline';
+
+const OBJECT_STORES = {};
+OBJECT_STORES.RELATIONS = {
+  name: 'relations',
+  option: {keyPath:'userid'}
+};
+OBJECT_STORES.VOICES = {
+  name: 'voices',
+  option: {keyPath:'side_time'}
+  func: (objectStore) => {
+    objectStore.createIndex('other_side', 'other_side', { unique: false });
+  }
+};
+OBJECT_STORES.CONFIG = {
+  name: 'config',
+  option: {keyPath:'userid'}
+};
+
+var db;
+var objectStrores ={};
+
+const initDB = () => {
+  const openReq = indexedDB.open(DB_NAME, VERSION);
+  openReq.onupgradeneeded = function(event) {
+    var db = event.target.result;
+    event.target.transaction.onerror = function(err) {
+      console.log("XXX0", err);
+    };
+    OBJECT_STORES.forEach((storeConfig) => {
+      var name = storeConfig.name;
+      if (db.objectStoreNames.contains(name)) {
+        db.deleteObjectStore(name);
+      }
+      objectStrores[name] = db.createObjectStore(name, storeConfig.option);
+      if (storeConfig.func) {
+        storeConfig.func(objectStrores[name]);
+      }
+    });
+  };
+  openReq.onsuccess = function(event) {
+    db = (event.target) ? event.target.result : event.result;
+  };
+  openReq.onerror = function(event){
+    console.log('db open error');
+  };
+};
+
+const putItem = (storeName, data, tranx) => {
+  const putReq = tranx.objectStore(storeName).put(data);
+  putReq.onsuccess = (event) => {
+    console.log('TODO');
+  };
+  putReq.onerror = (err) => {
+    console.log('TODO', err);
+  };
+}; 
+
+const put = (storeName, data, callback) => {
+
+  const tranx = db.transaction([storeName], 'readwrite');
+  tranx.oncomplete = function() {
+    callback();
+  };
+  tranx.onerror = function(err) {
+    console.log('TODO', err);
+  };
+
+  if (Array.isArray(data)) {
+    data.forEach((item) => {
+      putItem(storeName, item, tranx);
+    });
+  } else {
+    putItem(storeName, data, tranx);
+  }
+};
+
+const delete = (storeName, key) => {
+  const deleteReq = db.transaction([storeName], 'readwrite').objectStore(storeName).delete(key);
+  deleteReq.onsuccess = function(event) {
+    console.log('TODO');
+  };
+  deleteReq.onerror = function(err) {
+    console.log('TODO', err);
+  };
+};
+
+const get = (storeName, key, callback) => {
+  const getReq = db.transaction(storeName, 'readonly').objectStore(storeName).get(key);
+  getReq.onsuccess = function(event){
+    callback(event.target.result);
+  }
+  getReq.onerror = function(err){
+    console.log('TODO', err);
+  }
+};
+
+const getAll = (storeName, callback) => {
+
+  const results = [];
+  const cursorReq = db.transaction(storeName, 'readonly').objectStore(storeName).openCursor();
+  cursorReq.onsuccess = (event) => {
+    var result = event.target.result;
+    if (result) {
+      results.push(result.value);
+      result.continue();
+    } else {
+      return callback(results);
+    }
+  };
+  cursorReq.onerror = (event) => {
+    console.log('TODO', err);
+  };
+};
+
+const getByIndexOnly = (storeName, key, value, order, callback) => {
+
+  const results = [];
+  const cursorReq = db.transaction(storeName, 'readonly')
+                    .objectStore(storeName)
+                    .index(key)
+                    .openCursor(IDBKeyRange.only(value), order);
+  cursorReq.onsuccess = (event) => {
+    var result = event.target.result;
+    if (result) {
+      results.push(result.value);
+      result.continue();
+    } else {
+      return callback(results);
+    }
+  };
+  cursorReq.onerror = (event) => {
+    console.log('TODO', err);
+  };
+};
+
+const deleteDB = () => {
+  var deleteReq = indexedDB.deleteDatabase(DB_NAME);
+  deleteReq.onsuccess = function(event){
+    console.log('db delete success');
+    db = null;
+  }
+  deleteReq.onerror = function(){
+    console.log('db delete error');
+  }
+};
+
+const closeDB = () {
+  db.close();
+  db = null;
+};
+
+export default () => {
+  if (!indexedDB) {
+    console.log('cant use indexeddb.');
+  }
+  if (!db) {
+    initDB();
+  }
+  return {
+    OBJECT_STORES: OBJECT_STORES,
+    put: put,
+    get: get,
+    getAll: getAll,
+    getByIndexOnly: getByIndexOnly,
+    delete: delete,
+    closeDB: closeDB,
+    deleteDB: deleteDB,
+  };
+};
+

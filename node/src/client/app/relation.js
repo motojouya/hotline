@@ -54,7 +54,7 @@ var connect = function (relation, voices, relationNo, api) {
   }
 };
 
-export default function (frame, api, riot, route, phone) {
+export default function (frame, api, ws, riot, route, phone) {
 
   var display = function (relationNo) {
     var relation = getRelationObj(riot.observable),
@@ -73,7 +73,7 @@ export default function (frame, api, riot, route, phone) {
           transfer: transfer,
           serializeColor: serializeColor,
           sendMessage: function (message) {
-            api.sendMessage('VOICE', relation.userid, {
+            ws.sendMessage('VOICE', relation.userid, {
               relationNo: relationNo,
               message: message,
             });

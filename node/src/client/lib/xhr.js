@@ -5,83 +5,6 @@ const voice_request_size = 100;
 
 export default function (whenErr) {
 
-  var wsConn,
-      listeners = {};
-
-  var sendMessage = function (type, userid, message) {
-
-    var msgObj;
-    if (!message) {
-      msgObj = {
-        type: type,
-        message: userid,
-      };
-    } else {
-      msgObj = {
-        type: type,
-        userid: userid,
-        message: message,
-      };
-    }
-
-    if (wsConn) {
-      wsConn.send(msgObj);
-    } else {
-      connectWebSocket(function () {
-        wsConn.send(msgObj);
-      });
-    }
-  };
-
-  var closeWS = function (code, reason) {
-    wsConn.close(code, reason);
-  };
-
-  var onReceive = function (type, key, func) {
-    if (!wsConn) {
-      connectWebSocket(function () {});
-    }
-    if (!listeners[type]) {
-      listeners[type] = {};
-    }
-    listeners[type][key] = func;
-  };
-
-  var cancelListener = function (type, key) {
-    if (listeners[type]) {
-      listeners[type][key] = null;
-    }
-  };
-
-  var connectWebSocket = function (onFirst) {
-  
-    wsConn = new WebSocket('/api/ws');
-  
-    wsConn.onopen = onFirst;
-    wsConn.onclose = function () {
-      console.log('websocket connection closed. now trying connect again.');
-      wsConn = null;
-      setTimeout(connectWebSocket(callback, recover), 10000);
-    };
-    wsConn.onerror = function (event) {
-      whenErr();
-    };
-    wsConn.onmessage = function (event) {
-      var data,
-          key,
-          funcs;
-      if (event && event.data) {
-        data = event.data;
-        funcs = listeners[data.type];
-        for (key in funcs) {
-          if (funcs.hasOwnProperty(key) && funcs[key].toString() === 'Function') {
-            funcs[key](data);
-          }
-        }
-      }
-    };
-  };
-  
   var login = function (userid, password, onetimePassword, callback) {
     agent.post('/api/v1/login')
       .send({
@@ -207,8 +130,30 @@ export default function (whenErr) {
     return queryDic;
   };
 
+  const getVapidKey = (callback) => {
+    agent
+      .get('/api/v1/webpush/vapidkey')
+      .end(function (err, res) {
+        if (err) {
+          whenErr();
+        }
+        callback(res.body.publicKey);
+      });
+  };
+
+  const registerWebPush = (subscription, callback) => {
+    agent
+      .post('/api/v1/webpush/register')
+      .send(subscription)
+      .end(function (err, res) {
+        if (err) {
+          whenErr();
+        }
+        callback(res.body.publicKey);
+      });
+  };
+
   return {
-    connectWebSocket: connectWebSocket,
     getRelation: getRelation,
     makeRelation: makeRelation,
     breakRelation: breakRelation,
@@ -219,11 +164,8 @@ export default function (whenErr) {
     loadRelations: loadRelations,
     getQueryDictionary: getQueryDictionary,
     login: login,
-    sendMessage: sendMessage,
-    closeWS: closeWS,
-    onReceive: onReceive,
-    cancelListener: cancelListener,
+    getVapidKey: getVapidKey,
+    registerWebPush: registerWebPush,
   };
 };
-
 
