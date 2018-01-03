@@ -4,13 +4,13 @@ services:
   exam:
     depends_on:
       - rdb
-      - app
+      - hotline
     build: "./test"
 #   volumes:
 #     - "/home/docker/dev/test:/usr/local/src/test"
     links:
       - "rdb:rdb"
-      - "app:app"
+      - "hotline:hotline"
     environment:
       PG_USER: postgres
       PG_PASS: postgres
@@ -18,10 +18,10 @@ services:
       PG_HOST: rdb
       PG_PORT: 5432
       PGPASSWORD: postgres
-      APP_HOST: app
+      APP_HOST: hotline
       APP_PORT: 3000
     command: "dockerize -timeout 60s -wait tcp://rdb:5432 npm run test"
-  app:
+  hotline:
     depends_on:
       - rdb
     build: "./node"
