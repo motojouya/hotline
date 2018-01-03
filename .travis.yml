@@ -19,7 +19,7 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 # install:
 before_script:
-  - docker-compose up -d app
+  - docker-compose up -d
 script:
   - docker-compose run test
 # after_success:
