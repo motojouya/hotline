@@ -9,7 +9,7 @@ export default function (whenErr) {
     agent.post('/api/v1/login')
       .send({
         userid: userid,
-        password: loginpassword,
+        password: password,
         onetime_password: onetimePassword,
       }).end(function (err, res) {
         if (err) {
@@ -18,7 +18,7 @@ export default function (whenErr) {
         callback(res.body);
       });
   };
-  
+
   var makeRelation = function (userid, countersign, callback) {
     agent
       .post('/api/v1/relation/')
@@ -32,11 +32,17 @@ export default function (whenErr) {
         callback(res.body);
       });
   };
-  
-  var breakRelation = function (userid, callback) {
-    agent.delete('/api/v1/relation/' + userid).end(callback);
+
+  var breakRelation = function (relationNo, callback) {
+    agent.delete('/api/v1/relation/' + relationNo)
+      .end(function (err, res) {
+        if (err) {
+          whenErr();
+        }
+        callback(res.body);
+      });
   };
-  
+
   var getRelation = function (relationNo, callback) {
     agent.get('/api/v1/relation')
       .query({
@@ -48,7 +54,7 @@ export default function (whenErr) {
         callback(res.body);
       });
   };
-  
+
   var getRelations = function (offset, limit, callback) {
     agent.get('/api/v1/relation')
       .query({
@@ -61,9 +67,9 @@ export default function (whenErr) {
         callback(res.body);
       });
   };
-  
+
   var getVoices = function (relation_no, offset, limit, callback) {
-    agent.get('/api/v1/voices/' + relation_no)
+    agent.get('/api/v1/relation/' + relation_no + '/voice')
       .query({
         offset: offset,
         limit: limit,
@@ -74,7 +80,7 @@ export default function (whenErr) {
         callback(res.body);
       });
   };
-  
+
   var getConfig = function (callback) {
     agent.get('/api/v1/config').end(function (err, res) {
       if (err) {
@@ -83,37 +89,55 @@ export default function (whenErr) {
       callback(res.body);
     });
   };
-  
+
   var changeConfig = function (payload, callback) {
-    agent.put('/api/v1/config').send(payload).end(function (err, res) {
-      if (err) {
-        whenErr();
-      }
-      callback(res.body);
-    });
+    agent
+      .put('/api/v1/config')
+      .send(payload)
+      .end(function (err, res) {
+        if (err) {
+          whenErr();
+        }
+        callback(res.body);
+      });
   };
-  
-  var configThumbnail = function (file, callback) {
-    agent.put('/api/v1/config').send({file: file}).end(function (err, res) {
-      if (err) {
-        whenErr();
-      }
-      callback(res.body);
-    });
+
+  var changePassword = function (payload, callback) {
+    agent
+      .put('/api/v1/config/password')
+      .send(payload)
+      .end(function (err, res) {
+        if (err) {
+          whenErr();
+        }
+        callback(res.body);
+      });
   };
-  
+
+  var changeThumbnail = function (file, callback) {
+    agent
+      .put('/api/v1/config/thumbnail')
+      .send({file: file})
+      .end(function (err, res) {
+        if (err) {
+          whenErr();
+        }
+        callback(res.body);
+      });
+  };
+
   var loadRelations = function (offset, setRelations) {
     var callback = function cbRelations(result) {
-      setRelations(result.payload);
+      setRelations(result.results);
       if (result.hasNext) {
         setTimeout(getRelations(offset + payload.length, relation_request_size, cbRelations), 1000);
       }
     };
     getRelations(offset, relation_request_size, callback);
   };
-  
+
   var getQueryDictionary = function (query) {
-  
+
     if (!query) {
       return;
     }
@@ -122,7 +146,7 @@ export default function (whenErr) {
         len = paramEntry.length,
         queryDic = {},
         queryItem;
-  
+
     for (;i < len; i++) {
       queryItem = paramEntry[i].split('=');
       queryDic[queryItem[0]] = queryItem[1];
@@ -149,7 +173,7 @@ export default function (whenErr) {
         if (err) {
           whenErr();
         }
-        callback(res.body.publicKey);
+        callback(res.body.result);
       });
   };
 
@@ -160,7 +184,8 @@ export default function (whenErr) {
     getVoices: getVoices,
     getConfig: getConfig,
     changeConfig: changeConfig,
-    configThumbnail: configThumbnail,
+    changePassword: changePassword,
+    changeThumbnail: changeThumbnail,
     loadRelations: loadRelations,
     getQueryDictionary: getQueryDictionary,
     login: login,

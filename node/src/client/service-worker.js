@@ -5,7 +5,7 @@ import getWS from './lib/websocket';
 
 const db = getDB();
 const ws = getWS(() => {console.log('TODO');});
-const messagePort;
+let messagePort;
 
 const VERSION = 1;
 const STATIC_CACHE_NAME = 'statics_v' + VERSION;
@@ -107,7 +107,7 @@ const getRelation = (request, userid) => {
         let keptRes = response.clone();
         let payload = JSON.parse(keptRes.body);
         let data;
-        if (payload.hasOwnProperty('hasNext');) {
+        if (payload.hasOwnProperty('hasNext')) {
           data = payload.results;
         } else {
           data = payload;

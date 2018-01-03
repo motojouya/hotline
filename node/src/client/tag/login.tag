@@ -33,20 +33,24 @@
   </dl>
 </main>
 <script>
-var duties = opts.duties,
-    onetimePassword = opts.schema;
-this.errMsg = false;
+  var duties = opts.duties,
+      onetimePassword = opts.schema;
+  this.errMsg = false;
 
-login(event) {
-  event.preventDefault();
-  duties.login(userid, password, oneTimePassword, function (isSuccess) {
-    if (isSuccess) {
-      duties.transfer();
-    } else {
-      this.errMsg = true;
-    }
-  });
-}
+  login(event) {
+
+    var userid = this.refs.userid.value,
+        password = this.refs.password.value;
+
+    event.preventDefault();
+    duties.login(userid, password, onetimePassword, function (result) {
+      if (result.login) {
+        duties.transfer(result.config);
+      } else {
+        this.errMsg = true;
+      }
+    });
+  }
 </script>
 <style>
   login {

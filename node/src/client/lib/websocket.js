@@ -6,8 +6,9 @@ export default function (whenErr) {
 
   var sendMessage = function (type, userid, contents) {
 
-    var msgObj;
-    if (!message) {
+    var msgObj,
+        msgStr;
+    if (!contents) {
       msgObj = {
         type: type,
         contents: userid,
@@ -19,12 +20,12 @@ export default function (whenErr) {
         contents: contents,
       };
     }
-
+    msgStr = JSON.stringify(msgObj);
     if (wsConn) {
-      wsConn.send(msgObj);
+      wsConn.send(msgStr);
     } else {
-      connectWebSocket(function () {
-        wsConn.send(msgObj);
+      connect(function () {
+        wsConn.send(msgStr);
       });
     }
   };
@@ -35,7 +36,7 @@ export default function (whenErr) {
 
   var onReceive = function (type, key, func) {
     if (!wsConn) {
-      connectWebSocket(function () {});
+      connect(function () {});
     }
     if (!listeners[type]) {
       listeners[type] = {};
@@ -51,13 +52,14 @@ export default function (whenErr) {
 
   var init = (onFirst) => {
 
-    wsConn = new WebSocket('/api/ws');
-  
+    var url = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host;// + (location.port ? ':' + location.port : '');// + '/api/ws';
+    wsConn = new WebSocket(url);
+
     wsConn.onopen = onFirst;
     wsConn.onclose = function () {
       console.log('websocket connection closed. now trying connect again.');
       wsConn = null;
-      setTimeout(connectWebSocket(callback, recover), 10000);
+      // setTimeout(connect(function () {}), 10000);
     };
     wsConn.onerror = function (event) {
       whenErr();

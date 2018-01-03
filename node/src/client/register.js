@@ -1,6 +1,6 @@
 import agent from 'superagent';
 
-window.addEventListner('DOMContentLoaded', function (event) {
+window.addEventListener('DOMContentLoaded', function (event) {
 
   var checkExecuter,
       useridEle = document.getElementById('userid'),
@@ -8,64 +8,65 @@ window.addEventListner('DOMContentLoaded', function (event) {
       checkMsg = document.getElementById('check_message');
 
   var checkUserid = function () {
-    agent.get('/api/v1/checkuserid')
+    agent.get('/api/v1/check')
       .query({userid: useridEle.value})
       .end(function (err, res) {
         if (err) {
           alert('通信環境のいい場所で、再度お試しください');
         }
-        if (res.body.exists) {
-          checkMsg.text = '入力されたユーザIDはすでに使用されています\r他のユーザIDに変更してください。';
+        if (res.body.exist) {
+          checkMsg.innerHTML = '入力されたユーザIDはすでに使用されています<br>他のユーザIDに変更してください。';
           registerExeBtn.disabled = true;
         } else {
-          checkMsg.value = '入力されたユーザIDはご利用いただけます。';
+          checkMsg.innerHTML = '入力されたユーザIDはご利用いただけます。';
           registerExeBtn.disabled = false;
         }
       });
   };
 
-  useridEle.addEventListner('onchange', function (event) {
+  useridEle.addEventListener('change', function (event) {
     if (checkExecuter) {
       clearTimeout(checkExecuter);
     }
     checkExecuter = setTimeout(checkUserid, 1000);
   });
 
-  registerExeBtn.addEventListner('onclick', function (event) {
+  registerExeBtn.addEventListener('click', function (event) {
 
     var userid = useridEle.value,
-        email = document.getElementById('email'),
-        countersign = document.getElementById('countersign'),
-        loginpassword = document.getElementById('password'),
-        password_again = document.getElementById('password_again');
+        name = document.getElementById('name').value,
+        email = document.getElementById('email').value,
+        countersign = document.getElementById('countersign').value,
+        password = document.getElementById('password').value,
+        passwordAgain = document.getElementById('password_again').value;
 
-    if (!userid || !email || !countersign || !password || !password_again) {
+    if (!userid || !name || !email || !countersign || !password || !passwordAgain) {
       alert('すべての項目に値を入力してください');
       return;
     }
-    if (password !== password_again) {
+    if (password !== passwordAgain) {
       alert('パスワードは同じものを入力してください');
       return;
     }
 
     agent.post('/api/v1/register')
       .send({
-        userid: userid
-       ,email: email
-       ,countersign: countersign
-       ,loginpassword: loginpassword
-       ,password_again: againpassword
+        userid: userid,
+        name: name,
+        email: email,
+        countersign: countersign,
+        password: password
       }).end(function (err, res) {
         var registerForm;
         if (err) {
           alert('通信環境のいい場所で、再度お試しください');
         }
-        if (res.body.success) {
-          checkMsg.text = 'ユーザ登録に失敗しました。\r時間をおいて、再度お試しください。';
-        } else {
-          checkMsg.text = 'ユーザを登録しました。メールが届いたら、URLから再度ログインを行ってください。\rメールからログイン後、ご利用いただけます。';
+        if (res.body.register) {
+          checkMsg.innerHTML = 'ユーザを登録しました。メールが届いたら、URLから再度ログインを行ってください。<br>メールからログイン後、ご利用いただけます。';
           registerForm = document.getElementById('register_form');
           registerForm.parentNode.removeChild(registerForm);
+        } else {
+          checkMsg.innerHTML = 'ユーザ登録に失敗しました。<br>時間をおいて、再度お試しください。';
         }
       });
   });

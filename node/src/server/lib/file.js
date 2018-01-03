@@ -11,7 +11,13 @@ AWS.config.update({
 const s3 = new AWS.S3();
 const bucketName = process.env.S3_BUCKET
 
-module.export = (fs) => {
+module.exports = (fs) => {
+
+  if (process.env.NODE_ENV === 'develop') {
+    console.log('mail');
+    return (filename, path, file) => {};
+  }
+
   return (filename, path, file) => {
     var params = {
       Bucket: bucketName,

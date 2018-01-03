@@ -41,7 +41,8 @@
   });
 
   for (key in relationMap) {
-    if (relationMap.hasOwnProperty(key)) {
+    if (relationMap.hasOwnProperty(key)
+    && 'function' !== typeof relationMap[key]) {
       this.relationAry.push(relationMap[key]);
     }
   }

@@ -2,7 +2,7 @@
 const colorNumberBase = 7,
       colorNumberRange = 8;
 
-var calcColorElement = function (number) {
+const calcColorElement = (number) => {
   switch (number) {
   case 7:
     return 'e';
@@ -19,12 +19,12 @@ var calcColorElement = function (number) {
   }
 };
 
-export default function (colorNumber) {
+module.exports = (colorNumber) => {
 
-  if (isNaN(colorNumber) || colorNumber.length > 2 || colorNumber.length < 1 || colorNumber < 0 || colorNumber > 23) {
+  if (!colorNumber || isNaN(colorNumber) || colorNumber.length > 2 || colorNumber.length < 1 || colorNumber < 0 || colorNumber > 23) {
     return '77e';
   }
-  
+
   var colorInt = parseInt(colorNumber),
       area = Math.floor(colorInt / colorNumberRange),
       value = colorInt % colorNumberRange;

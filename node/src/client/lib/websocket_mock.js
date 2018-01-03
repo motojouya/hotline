@@ -3,7 +3,7 @@ export default function (whenErr) {
   var listeners = {};
 
   var sendMessage = function (type, userid, payload) {
-    voices.unshift({
+    window.voices.unshift({
       no: payload.relationNo,
       speak_at: "2017-07-02 10:10:10",
       userid: "matsumoto",

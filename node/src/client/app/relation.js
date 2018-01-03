@@ -1,4 +1,4 @@
-import serializeColor from '../lib/colors';
+import serializeColor from '../../lib/colors';
 
 var getRelationObj = function (observe) {
   var relation = {};
@@ -20,36 +20,43 @@ var getVoicesObj = function (observe) {
   var voices = [];
   observe(voices);
 
-  voices.set = function (result, order) {
+  voices.set = function (result) {
     var i = 0,
         len = result.length;
     for (; i < len; i++) {
-      if (order === 'NEW') {
-        voices.unshift(result[i]);
-      } else {
-        voices.push(result[i]);
-      }
+      voices.push(result[i]);
     }
     voices.trigger('change');
   };
+
+  voices.add = function (result, commit) {
+    if (!commit) {
+      voices.editting = result;
+    } else {
+      voices.unshift(result);
+      voices.editting = null;
+    }
+    voices.trigger('change');
+  };
+
   return voices;
 };
 
-var connect = function (relation, voices, relationNo, api) {
-  api.onReceive('RELATE', 'relate' + relationNo, function (payload) {
-    if (payload[relationNo]) {
-      relation.set(payload[relationNo]);
+var connect = function (relation, voices, relationNo, ws) {
+  ws.onReceive('RELATE', 'relate' + relationNo, function (payload) {
+    if (payload[relation_no]) {
+      relation.set(payload[relation_no]);
     }
   });
-  api.onReceive('VOICE', 'relate' + relationNo, function (payload) {
-    if (payload[relationNo]) {
-      voices.set(payload[relationNo], payload.order);
+  ws.onReceive('VOICE', 'relate' + relationNo, function (payload) {
+    if (relationNo == payload.contents.relation_no) {
+      voices.add(payload.contents.voice, payload.contents.commit);
     }
   });
 
   return function (path) {
-    api.cancelListener('RELATE', 'relate' + relationNo);
-    api.cancelListener('VOICE', 'relate' + relationNo);
+    ws.cancelListener('RELATE', 'relate' + relationNo);
+    ws.cancelListener('VOICE', 'relate' + relationNo);
     route(path);
   }
 };
@@ -59,28 +66,40 @@ export default function (frame, api, ws, riot, route, phone) {
   var display = function (relationNo) {
     var relation = getRelationObj(riot.observable),
         voices = getVoicesObj(riot.observable),
-        transfer = connect(relation, voices, relationNo, api),
+        config,
+        transfer = connect(relation, voices, relationNo, ws),
         voiceLoaded = false,
-        domLoaded = false;
+        domLoaded = false,
+        configLoaded = false;
 
     var buildChat = function () {
       riot.mount('section#chat' + relationNo + ' > chat', 'chat', {
         schema: {
           relation: relation,
           voices: voices,
+          config: config,
         },
         duties: {
           transfer: transfer,
           serializeColor: serializeColor,
-          sendMessage: function (message) {
-            ws.sendMessage('VOICE', relation.userid, {
-              relationNo: relationNo,
-              message: message,
-            });
+          sendMessage: function (contents) {
+            ws.sendMessage('VOICE', relation.userid, contents);
+            if (contents.commit) {
+              voices.add({
+                spoken_at: '',
+                userid: config.userid,
+                sentence: contents.sentence,
+              }, contents.commit);
+            }
           },
-          breakRelation: function (userid) {
-            api.breakRelation(userid, function (result) {
-              relation.set(result.payload);
+          breakRelation: function (relationNo) {
+            api.breakRelation(relationNo, function (result) {
+              if (result.breaks) {
+                relation.set(result.relation);
+                transfer('/app/');
+              } else {
+                alert('削除できませんでした');
+              }
             });
           },
           getSrc: frame.getSrc,
@@ -93,13 +112,21 @@ export default function (frame, api, ws, riot, route, phone) {
     frame.pause(true);
     frame.clear();
 
+    api.getConfig(function (result) {
+      config = result;
+      if (domLoaded && voiceLoaded && relation && relation.status == 'ACTIVE') {
+        buildChat();
+      }
+      configLoaded = true;
+    });
+
     api.getRelation(relationNo, function (result) {
       relation.set(result);
 
       if (relation && relation.status == 'ACTIVE') {
         frame.load('chat' + relationNo, 'chat', function () {
           domLoaded = true;
-          if (voiceLoaded) {
+          if (voiceLoaded && configLoaded) {
             buildChat();
           }
         });
@@ -112,12 +139,22 @@ export default function (frame, api, ws, riot, route, phone) {
               transfer: transfer,
               makeRelation: function (userid, countersign) {
                 api.makeRelation(userid, countersign, function (result) {
-                  relation.set(result.payload);
+                  if (result.make) {
+                    relation.set(result.relation);
+                    transfer('/app/');
+                  } else {
+                    alert('申請できませんでした');
+                  }
                 });
               },
-              breakRelation: function (userid) {
-                api.breakRelation(userid, function (result) {
-                  relation.set(result.payload);
+              breakRelation: function (relationNo) {
+                api.breakRelation(relationNo, function (result) {
+                  if (result.breaks) {
+                    relation.set(result.relation);
+                    transfer('/app/');
+                  } else {
+                    alert('削除できませんでした');
+                  }
                 });
               },
             },
@@ -128,17 +165,17 @@ export default function (frame, api, ws, riot, route, phone) {
     });
     //TODO スクロールした場合にvoiceを再取得
     api.getVoices(relationNo, 0, 20, function (result) {
-      voices.set(result.payload, 'OLD');
+      voices.set(result.results);
       voiceLoaded = true;
-      if (domLoaded && relation && relation.status == 'ACTIVE') {
+      if (domLoaded && configLoaded && relation && relation.status == 'ACTIVE') {
         buildChat();
       }
     });
   };
 
-  route('/app/relation/*', display);
+  route('app/relation/*', display);
 
-  route('/app/relation', function (relationNo) {
+  route('app/relation', function (relationNo) {
 
     var relation;
     frame.pause(true);
@@ -152,12 +189,22 @@ export default function (frame, api, ws, riot, route, phone) {
           makeRelation: function (userid, countersign) {
             api.makeRelation(userid, countersign, function (result) {
               relation = getRelationObj(riot.observable);
-              relation.set(result.payload);
+              if (result.make) {
+                relation.set(result.relation);
+                route('/app/');
+              } else {
+                alert('申請できませんでした');
+              }
             });
           },
-          breakRelation: function (userid) {
-            api.breakRelation(userid, function (result) {
-              relation.set(result.payload);
+          breakRelation: function (relationNo) {
+            api.breakRelation(relationNo, function (result) {
+              if (result.breaks) {
+                relation.set(result.relation);
+                route('/app/');
+              } else {
+                alert('削除できませんでした');
+              }
             });
           },
         },

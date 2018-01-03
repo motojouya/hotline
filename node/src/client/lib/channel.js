@@ -1,13 +1,13 @@
 
-export default function (whenErr) {
+export default (whenErr) => {
 
-  const channel;
-  const sendMessageSW;
+  let channel;
+  let sendMessageSW;
   const listeners = {};
 
-  var sendMessage = function (type, userid, contents) {
+  const sendMessage = (type, userid, contents) => {
 
-    var message;
+    let message;
     if (!contents) {
       message = {
         type: type,
@@ -24,19 +24,19 @@ export default function (whenErr) {
     if (channel) {
       sendMessageSW(message);
     } else {
-      connectWebSocket(function () {
+      connect(() => {
         sendMessageSW(message);
       });
     }
   };
 
-  var closeWS = function (code, reason) {
+  const closeWS = (code, reason) => {
     channel.port1.close();
   };
 
-  var onReceive = function (type, key, func) {
+  const onReceive = (type, key, func) => {
     if (!channel) {
-      connectWebSocket(function () {});
+      connect(() => {});
     }
     if (!listeners[type]) {
       listeners[type] = {};
@@ -44,13 +44,13 @@ export default function (whenErr) {
     listeners[type][key] = func;
   };
 
-  var cancelListener = function (type, key) {
+  const cancelListener = (type, key) => {
     if (listeners[type]) {
       listeners[type][key] = null;
     }
   };
 
-  var init = (onFirst) => {
+  const init = (onFirst) => {
 
     channel = new MessageChannel();
     channel.port1.onmessage = (event) => {
@@ -84,7 +84,7 @@ export default function (whenErr) {
     }
   };
 
-  var connect = function (onFirst) {
+  const connect = (onFirst) => {
     if (!channel) {
       init(onFirst);
     }

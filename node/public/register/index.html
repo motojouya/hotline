@@ -2,21 +2,84 @@
 <HTML lang="UTF-8">
 <head>
   <title>hotline [大切な人ともっとつながる]</title>
+  <link rel="stylesheet" type="text/css" href="/main.css">
   <style>
   </style>
-  <script src="./bundle.js" ></script>
 </head>
 <body>
+  <header class="invert buoyed flex">
+    <h1 class="sentence variableitem">hotline</h1>
+  </header>
   <main>
-    <div id="check_message">ユーザIDがほかで使用されていないかチェックします。<div>
+    <div id="check_message">ユーザIDがほかで使用されていないかチェックします。</div>
     <form method="post" id="register_form">
-      <input type="text" name="userid" id="userid">
-      <input type="email" name="email" id="email">
-      <input type="text" name="countersign" id="countersign">
-      <input type="password" name="password" id="password">
-      <input type="password" name="password_again" id="password_again">
-      <button type="submit" id="register_execute" value="登録" disabled>
+      <dl class="def">
+        <dt class="flex">
+          <div class="term fixeditem">ユーザID</div>
+          <div class="above_line variableitem"></div>
+          <div class="edit fixeditem"></div>
+        </dt>
+        <dd>
+          <div class="text_wrap">
+            <input type="text" class="modal_input" name="userid" id="userid">
+          </div>
+        </dd>
+        <dt class="flex">
+          <div class="term fixeditem">名前</div>
+          <div class="above_line variableitem"></div>
+          <div class="edit fixeditem"></div>
+        </dt>
+        <dd>
+          <div class="text_wrap">
+            <input type="text" class="modal_input" name="name" id="name">
+          </div>
+        </dd>
+        <dt class="flex">
+          <div class="term fixeditem">E-mailアドレス</div>
+          <div class="above_line variableitem"></div>
+          <div class="edit fixeditem"></div>
+        </dt>
+        <dd>
+          <div class="text_wrap">
+            <input type="email" class="modal_input" name="email" id="email">
+          </div>
+        </dd>
+        <dt class="flex">
+          <div class="term fixeditem">合言葉</div>
+          <div class="above_line variableitem"></div>
+          <div class="edit fixeditem"></div>
+        </dt>
+        <dd>
+          <div class="text_wrap">
+            <input type="text" class="modal_input" name="countersign" id="countersign">
+          </div>
+        </dd>
+        <dt class="flex">
+          <div class="term fixeditem">パスワード</div>
+          <div class="above_line variableitem"></div>
+          <div class="edit fixeditem"></div>
+        </dt>
+        <dd>
+          <div class="text_wrap">
+            <input type="password" class="modal_input" name="password" id="password">
+          </div>
+        </dd>
+        <dt class="flex">
+          <div class="term fixeditem">パスワード(確認)</div>
+          <div class="above_line variableitem"></div>
+          <div class="edit fixeditem"></div>
+        </dt>
+        <dd>
+          <div class="text_wrap">
+            <input type="password" class="modal_input" name="password_again" id="password_again">
+          </div>
+        </dd>
+        <dd>
+          <button type="button" id="register_execute" disabled>登録</button>
+        </dd>
+      </dl>
     </form>
   </main>
+  <script src="/register/bundle.js" ></script>
 </body>
 </HTML>

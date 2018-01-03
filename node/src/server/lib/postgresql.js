@@ -5,24 +5,27 @@ const config = {
   password: process.env.PG_PASSWORD,
   database: process.env.PG_NAME,
   host: process.env.PG_HOST,
-  port: PG_PORT,
-  ssl: true,
+  port: process.env.PG_PORT,
+  ssl: false,
   max: 10,
   min: 4,
   idleTimeoutMillis: 1000
 };
 
-var pool,
-    connect;
+var pool;
 
-module.export = (postgresql) => {
-  if (!pool || !connect) {
+module.exports = (postgresql) => {
+
+  if (!pool) {
     pool = new postgresql.Pool(config);
-    connect = (req, res, next) => {
+
+    var expressConnect = (req, res, next) => {
       pool.connect(function(err, client, done) {
         if(err) {
-          console.error('TODO', err);
-          return;
+          console.error('Connect postgresql pool error.', err);
+          done();
+          res.status(500);
+          return res.json({message: 'Server Error.'});
         }
         let connection = {};
         connection.client = client;
@@ -31,7 +34,25 @@ module.export = (postgresql) => {
         next();
       });
     };
+
+    var wsConnect = (callback) => {
+      pool.connect(function(err, client, done) {
+        if(err) {
+          console.error('Connect postgresql pool error.', err);
+          done();
+          callback(err, null);
+        }
+        let connection = {};
+        connection.client = client;
+        connection.done = done;
+        callback(null, connection);
+      });
+    };
   }
-  return connect;
+
+  return {
+    expressConnect: expressConnect,
+    wsConnect: wsConnect,
+  }
 }
 

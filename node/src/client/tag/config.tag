@@ -45,7 +45,7 @@
     <dt class="flex">
       <div class="term fixeditem">PASSWORD</div>
       <div class="above_line variableitem"></div>
-      <button type="button" onclick={changeLoginPassword} class="edit fixeditem">編集</button>
+      <button type="button" onclick={changePassword} class="edit fixeditem">編集</button>
     </dt>
     <dd>
       <span>********</span>
@@ -64,7 +64,7 @@
       <div class="edit fixeditem"></div>
     </dt>
     <dd>
-      <input type="range" value={configs.colorNumber} max="23" onmousemove={previewColor} onchange={changeColor} style="background-color:{themeColor}" />
+      <input type="range" value={configs.color} max="23" onmousemove={previewColor} onchange={changeColor} style="background-color:{themeColor}" />
     </dd>
     <dt class="flex">
       <div class="term fixeditem">通知</div>
@@ -72,18 +72,18 @@
       <div class="edit fixeditem"></div>
     </dt>
     <dd>
-      <label for="notification_none" class="radio_label">
-        <input type="radio" value="0" name="notification" onchange={changeNotification} id="notification_none" checked={configs.notification == 0} />
+      <label for="notification_never" class="radio_label">
+        <input type="radio" value="NEVER" name="notification" onchange={changeNotification} id="notification_never" checked={configs.notification === 'NEVER'} />
         <span class="radio_button"></span>
         通知しない
       </label>
-      <label for="notification_first" class="radio_label">
-        <input type="radio" value="1" name="notification" onchange={changeNotification} id="notification_first" checked={configs.notification == 1} />
+      <label for="notification_unless" class="radio_label">
+        <input type="radio" value="UNLESS" name="notification" onchange={changeNotification} id="notification_unless" checked={configs.notification === 'UNLESS'} />
         <span class="radio_button"></span>
         最初の1回のみ
       </label>
       <label for="notification_always" class="radio_label">
-        <input type="radio" value="2" name="notification" onchange={changeNotification} id="notification_always" checked={configs.notification == 2} />
+        <input type="radio" value="ALWAYS" name="notification" onchange={changeNotification} id="notification_always" checked={configs.notification == 'ALWAYS'} />
         <span class="radio_button"></span>
         常に通知
       </label>
@@ -105,7 +105,7 @@
     <div id="modal_password" class="modal_content">
       <div>PASSWORDを入力してください。</div>
       <div class="text_wrap">
-        <input type="text" class="modal_input" ref="old_password" placeholder="現在のPASSWORD">
+        <input type="text" class="modal_input" ref="now_password" placeholder="現在のPASSWORD">
       </div>
       <div class="text_wrap">
         <input type="text" class="modal_input" ref="new_password" placeholder="新しいPASSWORD">
@@ -138,7 +138,8 @@
 <script>
 
   var reserveChangeConfig = {},
-      duties = opts.duties;
+      duties = opts.duties,
+      that = this;
 
   var closeModals = function (modals, configName, newValue) {
     modals.inputText = false;
@@ -150,7 +151,7 @@
   };
 
   this.configs = opts.schema;
-  this.themeColor = '#' + duties.serializeColor(this.configs.colorNumber);
+  this.themeColor = '#' + duties.serializeColor(this.configs.color);
   this.configName = null;
   this.newValue = null;
   this.modals = {};
@@ -159,11 +160,15 @@
   this.modals.comfirmText = false;
   this.modals.comfirmPassword = false;
 
+  this.configs.on('change', function () {
+    that.update();
+  });
+
   cancel(event) {
     closeModals(this.modals, this.configName, this.newValue);
   }
 
-  change (event) {
+  change(event) {
     closeModals(this.modals, this.configName, this.newValue);
     switch (this.configName) {
     case '名前':
@@ -195,7 +200,7 @@
       duties.changer.changeConfig({countersign: this.refs.input_text.value});
       break;
     case 'PASSWORD':
-      duties.changer.configLoginPassword(this.refs.old_password.value, this.refs.new_password.value);
+      duties.changer.changePassword(this.refs.now_password.value, this.refs.new_password.value);
       break;
     }
   }
@@ -205,16 +210,16 @@
   }
 
   changeColor(event) {
-    var reservation = reserveChangeConfig['color']
-      , colorNumber = event.currentTarget.value;
+    var reservation = reserveChangeConfig['color'],
+        color = event.currentTarget.value;
 
-    this.themeColor = '#' + duties.serializeColor(colorNumber);
+    this.themeColor = '#' + duties.serializeColor(color);
 
     if (reservation) {
-      canselTimeout(reservation);
+      clearTimeout(reservation);
     }
-    setTimeout(function () {
-      duties.changer.changeConfig({colorNumber: colorNumber});
+    reserveChangeConfig['color'] = setTimeout(function () {
+      duties.changer.changeConfig({color: color});
     }, 1000);
   }
 
@@ -222,10 +227,10 @@
     var reservation = reserveChangeConfig['thumbnail'],
         thumbnail = event.currentTarget.file;
     if (reservation) {
-      canselTimeout(reservation);
+      clearTimeout(reservation);
     }
-    setTimeout(function () {
-      duties.changer.configThumbnail(thumbnail);
+    reserveChangeConfig['thumbnail'] = setTimeout(function () {
+      duties.changer.changeThumbnail(thumbnail);
     }, 1000);
   }
 
@@ -247,18 +252,18 @@
     var reservation = reserveChangeConfig['notification'],
         notification = event.currentTarget.value;
     if (reservation) {
-      canselTimeout(reservation);
+      clearTimeout(reservation);
     }
-    setTimeout(function () {
+    reserveChangeConfig['notification'] = setTimeout(function () {
       duties.changer.changeConfig({notification: notification});
     }, 1000);
   }
 
-  changeLoginPassword(event) {
+  changePassword(event) {
     closeModals(this.modals, this.configName, this.newValue);
     this.configName = 'PASSWORD';
     this.modals.inputPassword = true;
-    this.refs.old_password.value = '';
+    this.refs.now_password.value = '';
     this.refs.new_password.value = '';
   }
 

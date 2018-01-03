@@ -1,6 +1,6 @@
 'use strict';
 
-module.export = (filename, file) => {
+module.exports = (filename, file) => {
   console.log(filename);
 };
 

@@ -9,11 +9,11 @@ var getRelationsObj = function (observe) {
         relation,
         key,
         obj;
-  
+
     for (; i < len; i++) {
       obj = relationAry[i];
       relation = relationDic[obj.relation_no] || {};
-  
+
       for (key in obj) {
         if (obj.hasOwnProperty(key)) {
           relation[key] = obj[key];
@@ -25,22 +25,22 @@ var getRelationsObj = function (observe) {
   return relationDic;
 };
 
-var connect = function (relationDic, api) {
-  api.onReceive('RELATE', 'relations', function (payload) {
+var connect = function (relationDic, ws) {
+  ws.onReceive('RELATE', 'relations', function (payload) {
     relationDic.set(payload);
   });
 
   return function (path) {
-    api.cancelListener('RELATE', 'relations');
+    ws.cancelListener('RELATE', 'relations');
     route(path);
   };
 };
 
-export default function (frame, api, riot, route) {
-  route('/app', function () {
+export default function (frame, api, ws, riot, route) {
+  route('app', function () {
 
     var relationDic = getRelationsObj(riot.observable),
-        transfer = connect(relationDic, api),
+        transfer = connect(relationDic, ws),
         relationLoaded = false,
         domLoaded = false;
 
@@ -61,8 +61,8 @@ export default function (frame, api, riot, route) {
       }
       domLoaded = true;
     });
-    api.loadRelations(0, function (result) {
-      relationDic.set(result.payload);
+    api.loadRelations(0, function (results) {
+      relationDic.set(results);
       if (domLoaded && !relationLoaded) {
         build();
       }

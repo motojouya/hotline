@@ -1,6 +1,6 @@
 import getFrame from './lib/frame';
 import getAPI from './lib/xhr_mock';
-import getWS from './lib/websocket';
+import getWS from './lib/websocket_mock';
 import getChannel from './lib/channel';
 import getPhone from './lib/phone_mock';
 import registerWebPush from './lib/webpush';
@@ -12,67 +12,61 @@ import relation from './app/relation';
 
 window.addEventListener('DOMContentLoaded', function (event) {
 
-  window.navigator.serviceWorker.register("service-worker.js").catch(console.error.bind(console));
-
-  var frame = getFrame(document),
-      api = getAPI(frame.whenErr),
-      ws;
-
-  if ('serviceWorker' in navigator) {
-    ws = getChannel(frame.whenErr);
-  } else {
-    ws = getWS(frame.whenErr);
+  if (location.protocol === 'https:') {
+    window.navigator.serviceWorker.register('service-worker.js').catch(console.error.bind(console));
   }
 
-  var phone = getPhone(ws),
-      loginChecked = 'NOTYET',
-      domLoaded = false,
-      query = api.getQueryDictionary(location.search),
-      onetimePassword;
+  const frame = getFrame(document);
+  const api = getAPI(frame.whenErr);
 
-  if (query) {
-    onetimePassword = query.onetimePassword;
-  }
+  const startApplication = (userInfo) => {
 
-  var viewFirst = function (logined) {
+    var ws;
+    if (location.protocol === 'https:' && 'serviceWorker' in navigator) {
+      ws = getChannel(frame.whenErr);
+    } else {
+      ws = getWS(frame.whenErr);
+    }
+    var phone = getPhone(ws);
 
-    if (logined === 'SUCCESS') {
-      route(location.pathname);//TODO pathname? href?
+    route.base('/');
 
-    } else if (logined === 'FAILURE') {
+    if (location.protocol === 'https:') {
+      registerWebPush(api, window.navigator);
+    }
+    menu(frame, api, ws, riot, route);
+    relation(frame, api, ws, riot, route, phone);
+    config(frame, api, ws, riot, route);
+
+    if (location.search) {
+      route(location.pathname);
+    } else {
+      route.start(true);
+    }
+  };
+
+  var query = api.getQueryDictionary(location.search),
+      onetimePassword = query && query.onetime_password;
+
+  api.login(null, null, null, (result) => {
+    if (result.login) {
+      startApplication(result.config);
+
+    } else {
       frame.pause(true);
       frame.clear();
-      frame.load('menu', 'menu', function () {
+      frame.load('login', 'login', function () {
         riot.mount('login', 'login', {
           schema: onetimePassword,
-          duties: {transfer: function () {
-            route(location.pathname);//TODO pathname? href?
-          }}
+          duties: {
+            login: api.login,
+            transfer: startApplication,
+          }
         });
         frame.pause(false);
       });
     }
-  };
-
-  api.login(null, null, null, function (isSuccess) {
-    if (isSuccess) {
-      loginChecked = 'SUCCESS';
-    } else {
-      loginChecked = 'FAILURE';
-    }
-    if (domLoaded) {
-      viewFirst(loginChecked);
-    }
   });
 
-  registerWebPush(api, window.navigator);
-  menu(frame, api, riot, route);
-  relation(frame, api, getWS(), riot, route, phone);
-  config(frame, api, riot, route);
-
-  domLoaded = true;
-  if (loginChecked !== 'NOTYET') {
-    viewFirst(loginChecked);
-  }
 });
 

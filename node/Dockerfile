@@ -13,17 +13,29 @@ ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     NODE_PATH=/usr/local/lib/node_modules
 
-RUN apt-get install -y vim && \
-    npm install -g riot && \
-    npm install -g pm2 && \
+RUN npm install -g riot && \
+    npm install -g forever && \
     npm install -g babel-cli && \
     npm install -g babel-core && \
     npm install -g uglify-js && \
     npm install -g less && \
     npm install -g webpack && \
     npm install -g eslint && \
-    npm install -g karma
-    npm install -g mocha
+    npm install -g karma && \
+    npm install -g mocha && \
+    useradd -d /home/hotline -m -s /bin/bash hotline && \
+    mkdir /usr/local/src/hotline && \
+    chown hotline /usr/local/src/hotline && \
+    chmod 755 /usr/local/src/hotline
 
 WORKDIR /usr/local/src/hotline
+COPY . ./
+RUN chown -R hotline:hotline .
 
+USER hotline
+
+RUN npm install && \
+    node makeKey.js && \
+    npm run build
+
+CMD npm start

@@ -1,113 +1,118 @@
 'use strict';
 
-var ws = require('ws');
-var parseCookie = require('connect').utils.parseCookie;
+// const parseCookie = require('cookie').parse;
+// const SELECT_RELATION
+//     = 'SELECT users.userid AS userid'
+//     + '     , users.name AS name'
+//     + '     , users.color AS color'
+//     + '     , users.thumbnail AS thumbnail'
+//     + '     , self.is_applicant AS is_applicant'
+//     + '     , relations.status AS status'
+//     + '     , relations.relation_no AS relation_no'
+//     + '  FROM relation_user AS self'
+//     + ' INNER JOIN relations AS relations'
+//     + '    ON self.relation_no = relations.relation_no'
+//     + '   AND self.userid = $1'
+//     + '   AND relations.status IN (\'PENDING\', \'ACTIVE\')'
+//     + ' INNER JOIN relation_user AS other'
+//     + '    ON relations.relation_no = other.relation_no'
+//     + '   AND other.userid <> $2'
+//     + ' INNER JOIN users AS users'
+//     + '    ON other.userid = users.userid'
+//     + '   AND other.active = TRUE';
+const ws = require('ws');
 
-var SELECT_RELATION
-  = 'SELECT users.userid AS userid'
-  + '     , users.name AS name'
-  + '     , users.color AS color'
-  + '     , users.thumbnail AS thumbnail'
-  + '     , self.is_applicant AS is_applicant'
-  + '     , relations.status AS status'
-  + '     , relations.relation_no AS relation_no'
-  + '  FROM relation_user AS self'
-  + ' INNER JOIN relations AS relations'
-  + '    ON self.relation_no = relations.relation_no'
-  + '   AND self.userid = $1'
-  + '   AND relations.status IN (\'PENDING\', \'ACTIVE\')'
-  + ' INNER JOIN relation_user AS other'
-  + '    ON relations.relation_no = other.relation_no'
-  + '   AND other.userid <> $2'
-  + ' INNER JOIN users AS users'
-  + '    ON other.userid = users.userid'
-  + '   AND other.active = TRUE';
+module.exports = (server, sessionParser, dbConnect, sendWebpush) => {
 
-module.export = function (server, store, sendWebpush) {
+  // var inSession = function (cookie, store, callback) {
+  //   store.get(parseCookie(cookie)['connect.sid'], callback);
+  // };
 
-  var inSession = function (cookie, store, callback) {
-    store.get(parseCookie(cookie)['connect.sid'], callback);
-  };
-
-  var wss = new ws.Server({server: server}),
-      connections = {},
+  var connections = {},
       listeners = {};
+  const wsServer = new ws.Server({
+    verifyClient: (info, done) => {
+      sessionParser(info.req, {}, () => {
+        console.log('Connecting websocket.', !!info.req.session.userInfo);
+        done(!!info.req.session.userInfo);
+      });
+    },
+    server: server,
+  });
 
-  var sendMessage = function (userid, message, conn) {
-    var userConn = connections[userid];
+  const sendMessage = function (userid, contents, conn) {
+    const userConn = connections[userid];
     if (userConn) {
-      userConn.send(message);
+      conn && conn.done();
+      userConn.send(JSON.stringify(contents));
+
     } else {
-      sendWebpush(userid, conn, message, message.subject,
-        (result) => {
-          console.log('TODO');
-        },
-        (err) => {
-          console.log('TODO');
-        }
-      );
+      if (conn) {
+        sendWebpush(userid, conn, contents, contents.subject,
+          (result) => {
+            console.log('Send Webpush success.', userid);
+          },
+          (err) => {
+            console.error('Send Webpush error.', userid);
+          }
+        );
+      }
     }
   };
 
-  var onReceive = function (type, key, callback) {
+  const onReceive = function (type, key, callback) {
     if (!listeners[type]) {
       listeners[type] = {};
     }
     listeners[type][key] = callback;
   };
 
-  var cancelListener = function (type, key) {
+  const cancelListener = function (type, key) {
     if (listeners[type]) {
       listeners[type][key] = null;
     }
   };
 
-  wss.on('connection', function (ws) {
-    var userInfo = getUserInfo();
+  wsServer.on('connection', function (ws, req) {
+
+    const userInfo = req.session.userInfo;
+    ws.userid = userInfo.userid;
     connections[userInfo.userid] = ws;
-    ws.on('close', function () {
-      connections[userInfo.userid] = null;
-    });
 
     ws.on('message', function (message) {
-      inSession(message.cookie, store, function(err, session) {
+      console.log('received websocket message.', ws.userid, message);
+      var msgObj = JSON.parse(message);
 
+      dbConnect(function(err, conn) {
         if (err) {
-          console.error('TODO', err);
-          conn.done();
-          return;
+          console.error('DB connection error.', err);
+          return sendMessage(ws.userid, 'send message failure.', conn);
         }
-        var userInfo = session.userInfo;
-        var conn = session.connection;
-        var selfUserid = userInfo.userid;
-        var otherUserid = message.userid;
-
-        conn.client.query(SELECT_RELATION + ' WHERE other.userid = $3', [selfUserid, selfUserid, otherUserid], function (err, result) {
-          if (err) {
-            console.error('TODO', err);
-            conn.done();
-            return;
+        var selfUserid = ws.userid,
+            key,
+            funcs,
+            calledAny = false;
+        funcs = listeners[msgObj.type];
+        for (key in funcs) {
+          if (funcs.hasOwnProperty(key) && 'function' === typeof funcs[key]) {
+            //TODO ï°êîÇÃä÷êîÇ…connÇìnÇµÇƒÇ¢ÇÈÇ™ÅAconnÇÕÇªÇÍÇºÇÍÇÃä÷êîÇ≈closeÇ≥ÇÍÇƒÇµÇ‹Ç§ÅB
+            funcs[key](selfUserid, msgObj, conn);
+            calledAny = true;
           }
-          var relation = result.rows[0]);
-          if (!relation) {
-            console.log('TODO');
-            return;
-          }
-
-          var data,
-              key,
-              funcs;
-          if (event && event.data) {
-            contents = message.contents;
-            funcs = listeners[message.type];
-            for (key in funcs) {
-              if (funcs.hasOwnProperty(key) && funcs[key].toString() === 'Function') {
-                funcs[key](userInfo, relation, message.contents, conn);
-              }
-            }
-          }
-        });
+        }
+        if (!calledAny) {
+          conn.done();
+        }
       });
+    });
+
+    ws.on('error', function (err) {
+      console.log('Websocket error at received message.', err);
+      sendMessage(ws.userid, 'send message failure by unknown reason.', null);
+    });
+
+    ws.on('close', function () {
+      connections[ws.userid] = null;
     });
   });
 

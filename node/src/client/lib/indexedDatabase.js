@@ -9,32 +9,32 @@ const DB_NAME = 'hostline';
 const OBJECT_STORES = {};
 OBJECT_STORES.RELATIONS = {
   name: 'relations',
-  option: {keyPath:'userid'}
+  option: {keyPath:'userid'},
 };
 OBJECT_STORES.VOICES = {
   name: 'voices',
-  option: {keyPath:'side_time'}
+  option: {keyPath:'side_time'},
   func: (objectStore) => {
     objectStore.createIndex('other_side', 'other_side', { unique: false });
-  }
+  },
 };
 OBJECT_STORES.CONFIG = {
   name: 'config',
-  option: {keyPath:'userid'}
+  option: {keyPath:'userid'},
 };
 
-var db;
-var objectStrores ={};
+let db;
+const objectStrores ={};
 
 const initDB = () => {
   const openReq = indexedDB.open(DB_NAME, VERSION);
-  openReq.onupgradeneeded = function(event) {
-    var db = event.target.result;
-    event.target.transaction.onerror = function(err) {
+  openReq.onupgradeneeded = (event) => {
+    const db = event.target.result;
+    event.target.transaction.onerror = (err) => {
       console.log("XXX0", err);
     };
     OBJECT_STORES.forEach((storeConfig) => {
-      var name = storeConfig.name;
+      const name = storeConfig.name;
       if (db.objectStoreNames.contains(name)) {
         db.deleteObjectStore(name);
       }
@@ -44,10 +44,10 @@ const initDB = () => {
       }
     });
   };
-  openReq.onsuccess = function(event) {
+  openReq.onsuccess = (event) => {
     db = (event.target) ? event.target.result : event.result;
   };
-  openReq.onerror = function(event){
+  openReq.onerror = (event) => {
     console.log('db open error');
   };
 };
@@ -65,10 +65,10 @@ const putItem = (storeName, data, tranx) => {
 const put = (storeName, data, callback) => {
 
   const tranx = db.transaction([storeName], 'readwrite');
-  tranx.oncomplete = function() {
+  tranx.oncomplete = () => {
     callback();
   };
-  tranx.onerror = function(err) {
+  tranx.onerror = (err) => {
     console.log('TODO', err);
   };
 
@@ -81,22 +81,22 @@ const put = (storeName, data, callback) => {
   }
 };
 
-const delete = (storeName, key) => {
+const del = (storeName, key) => {
   const deleteReq = db.transaction([storeName], 'readwrite').objectStore(storeName).delete(key);
-  deleteReq.onsuccess = function(event) {
+  deleteReq.onsuccess = (event) => {
     console.log('TODO');
   };
-  deleteReq.onerror = function(err) {
+  deleteReq.onerror = (err) => {
     console.log('TODO', err);
   };
 };
 
 const get = (storeName, key, callback) => {
   const getReq = db.transaction(storeName, 'readonly').objectStore(storeName).get(key);
-  getReq.onsuccess = function(event){
+  getReq.onsuccess = (event) => {
     callback(event.target.result);
   }
-  getReq.onerror = function(err){
+  getReq.onerror = (err) => {
     console.log('TODO', err);
   }
 };
@@ -106,7 +106,7 @@ const getAll = (storeName, callback) => {
   const results = [];
   const cursorReq = db.transaction(storeName, 'readonly').objectStore(storeName).openCursor();
   cursorReq.onsuccess = (event) => {
-    var result = event.target.result;
+    const result = event.target.result;
     if (result) {
       results.push(result.value);
       result.continue();
@@ -127,7 +127,7 @@ const getByIndexOnly = (storeName, key, value, order, callback) => {
                     .index(key)
                     .openCursor(IDBKeyRange.only(value), order);
   cursorReq.onsuccess = (event) => {
-    var result = event.target.result;
+    const result = event.target.result;
     if (result) {
       results.push(result.value);
       result.continue();
@@ -141,17 +141,17 @@ const getByIndexOnly = (storeName, key, value, order, callback) => {
 };
 
 const deleteDB = () => {
-  var deleteReq = indexedDB.deleteDatabase(DB_NAME);
-  deleteReq.onsuccess = function(event){
+  const deleteReq = indexedDB.deleteDatabase(DB_NAME);
+  deleteReq.onsuccess = (event) => {
     console.log('db delete success');
     db = null;
   }
-  deleteReq.onerror = function(){
+  deleteReq.onerror = () => {
     console.log('db delete error');
   }
 };
 
-const closeDB = () {
+const closeDB = () => {
   db.close();
   db = null;
 };
@@ -169,7 +169,7 @@ export default () => {
     get: get,
     getAll: getAll,
     getByIndexOnly: getByIndexOnly,
-    delete: delete,
+    del: del,
     closeDB: closeDB,
     deleteDB: deleteDB,
   };

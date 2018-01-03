@@ -24,8 +24,11 @@
 <main class="flex fcol" if={phone.state === 'WAITING'}>
   <div class="voice_list_wrap variableitem">
     <ul class="voicelist flex fcolre">
-      <li each={voices} class="variableitem {self: (parent.relation.userid === userid)}">
-        <span style={(parent.relation.userid === userid) ? '' : ('background-color:' + themeColor)}>{message}</span>
+      <li if={voices.editting && voices.editting.sentence} class="variableitem">
+        <span style={'background-color:' + themeColor}>{voices.editting.sentence}</span>
+      </li>
+      <li each={voices} class="variableitem {self: (parent.config.userid === userid)}">
+        <span style={(parent.config.userid === userid) ? '' : ('background-color:' + themeColor)}>{sentence}</span>
       </li>
     </ul>
   </div>
@@ -56,12 +59,13 @@
   this.phone = opts.phone;
   this.relation = schema.relation;
   this.voices = schema.voices;
+  this.config = schema.config;
   this.calling = false;
   this.remoteSrc = '';
   this.localSrc = '';
-  this.themeColor = '#' + duties.serializeColor(this.relation.colorNumber);
+  this.themeColor = '#' + duties.serializeColor(this.relation.color);
 
-  this.voices.on('change', function (){
+  this.voices.on('change', function () {
     that.update();
   });
 
@@ -104,13 +108,22 @@
     event.preventDefault();
 
     for (; i < lastIndex; i++) {
-      duties.sendMessage(messageLines[i], true);
+      duties.sendMessage({
+        sentence: messageLines[i],
+        commit: true,
+      });
     }
     if (key === 13) {
-      duties.sendMessage(messageLines[lastIndex], true);
+      duties.sendMessage({
+        sentence: messageLines[lastIndex],
+        commit: true,
+      });
       this.refs.message.value = '';
     } else {
-      duties.sendMessage(messageLines[lastIndex], false);
+      duties.sendMessage({
+        sentence: messageLines[lastIndex],
+        commit: false,
+      });
       this.refs.message.value = messageLines[lastIndex];
     }
   }
@@ -119,11 +132,11 @@
     alert('TODO');
   }
 
-  breakRalation(event) {
+  breakRelation(event) {
     if (!confirm('ホットラインを解消してもよいですか？')) {
       return;
     }
-    duties.breakRelation(this.relation.userid);
+    duties.breakRelation(this.relation.relation_no);
   }
 
   openOptions(event) {

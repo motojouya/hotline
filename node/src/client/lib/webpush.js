@@ -1,7 +1,5 @@
 'use strict';
 
-import agent from 'superagent';
-
 const urlB64ToUint8Array = (base64String) => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -44,7 +42,7 @@ const registerServiceWorker = (xhr, navigator) => {
   });
 };
 
-const requestNotificationPermission => (navigator, callback) {
+const requestNotificationPermission = (navigator, callback) => {
   Notification.requestPermission((permission) => {
     if (permission !== 'denied') {
       if ('permissions' in navigator) {

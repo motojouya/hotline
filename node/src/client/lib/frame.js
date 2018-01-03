@@ -5,7 +5,7 @@ const loadingClassName = 'loading';
 export default function (dom) {
 
   var domItems = {};
-  
+
   var pause = function (isPause) {
     var loading = dom.getElementById(loadingClassName);
     if (isPause) {
@@ -14,7 +14,7 @@ export default function (dom) {
       loading.classList.add('invisible');
     }
   };
-  
+
   var clear = function (tagId) {
     if (tagId && domItems[tagId]) {
       delete domItems[tagId];
@@ -27,14 +27,14 @@ export default function (dom) {
       }
     }
   };
-  
+
   var load = function (tagId, tagName, callback) {
-  
+
     var bodyTag = dom.getElementById('body'),
         section = dom.createElement('section'),
         tag = dom.createElement(tagName),
         script = dom.createElement('script');
-  
+
     script.onload = function (event) {
       callback();
     };
@@ -42,7 +42,7 @@ export default function (dom) {
     section.appendChild(script);
     section.appendChild(tag);
     section.setAttribute('id', tagId);
-  
+
     bodyTag.appendChild(section);
     domItems[tagId] = section;
   };

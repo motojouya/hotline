@@ -1,11 +1,11 @@
 import agent from 'superagent';
 
-var relations = [
+window.relations = [
   {relation_no: 1, userid: "hamada", name: "浜田", is_applicant: true, colorNumber: "313", status: "ACTIVE", thumbnail: "/app/img/test.jpg", message: "2017-07-01 12:34:56", call: "2017-06-17 11:21:45"}
  ,{relation_no: 2, userid: "takasu", name: "高須", is_applicant: false, colorNumber: "291", status: "PENDING", thumbnail: "/app/img/test.jpg", message: "2017-04-09 23:12:21", call: null}
 ];
 
-var voices = [
+window.voices = [
   {no: 1, speak_at: "2017-07-02 10:10:10", userid: "hamada", message: "", meta_flag: null, file_no: null, tel_flag: null},
   {no: 1, speak_at: "2017-07-01 12:35:27", userid: "hamada", message: "どういたしまして", meta_flag: null, file_no: null, tel_flag: null},
   {no: 1, speak_at: "2017-07-01 12:35:25", userid: "matsumoto", message: "ありがとう", meta_flag: null, file_no: null, tel_flag: null},
@@ -28,22 +28,22 @@ export default function (whenErr) {
 
   var makeRelation = function (userid, countersign, callback) {
     if (userid === 'yamada' && countersign === 'america') {
-      callback({result: true, payload: relations[0]});
+      callback({result: true, payload: window.relations[0]});
     } else {
-      callback({result: false, payload: relations[0]});
+      callback({result: false, payload: window.relations[0]});
     }
   };
   
   var breakRelation = function (userid, callback) {
-    callback({result: true, payload: relations[0]});
+    callback({result: true, payload: window.relations[0]});
   };
   
   var getRelation = function (relationNo, callback) {
     var i = 0,
-        len = relations.length;
+        len = window.relations.length;
     for (; i < len; i++) {
-      if (relationNo == relations[i].relation_no) {
-        callback(relations[i]);
+      if (relationNo == window.relations[i].relation_no) {
+        callback(window.relations[i]);
         return;
       }
     }
@@ -51,11 +51,11 @@ export default function (whenErr) {
   };
   
   var getRelations = function (offset, limit, callback) {
-    callback({hasNext: false, payload: relations});
+    callback({hasNext: false, payload: window.relations});
   };
   
   var getVoices = function (userid, offset, limit, callback) {
-    callback({hasNext: false, payload: voices});
+    callback({hasNext: false, payload: window.voices});
   };
   
   var getConfig = function (callback) {
@@ -104,6 +104,14 @@ export default function (whenErr) {
     callback(true);
   };
 
+  const getVapidKey = (callback) => {
+    callback(res.body.publicKey);
+  };
+
+  const registerWebPush = (subscription, callback) => {
+    callback(true);
+  };
+
   return {
     getRelation: getRelation,
     makeRelation: makeRelation,
@@ -115,6 +123,8 @@ export default function (whenErr) {
     loadRelations: loadRelations,
     getQueryDictionary: getQueryDictionary,
     login: login,
+    getVapidKey: getVapidKey,
+    registerWebPush: registerWebPush,
   };
 };
 

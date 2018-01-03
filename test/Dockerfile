@@ -11,17 +11,31 @@ RUN export DEBIAN_FRONTEND=noninteractive LANG && \
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    NODE_PATH=/usr/local/lib/node_modules
+    NODE_PATH=/usr/local/lib/node_modules \
+    DOCKERIZE_VERSION=v0.6.0
 
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
+    tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
+    rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo "deb http://dl.google.com/linux/chrome/deb/ stable main " >> /etc/apt/sources.list.d/google.list && \
     apt-get update && \
-    apt-get install -y google-chrome-stable
+    apt-get install -y openjdk-7-jdk && \
+    apt-get install -y google-chrome-stable && \
+    apt-get install -y chromedriver && \
+    apt-get install -y postgresql-client
 
-RUN apt-get install -y vim && \
-    npm install -g webdriverio && \
+RUN npm install -g webdriverio && \
     npm install -g selenium-standalone && \
-    npm install -g mocha
+    npm install -g mocha && \
+    useradd -d /home/test -m -s /bin/bash test && \
+    mkdir /usr/local/src/test && \
+    chown test /usr/local/src/test && \
+    chmod 755 /usr/local/src/test
 
 WORKDIR /usr/local/src/test
+COPY . ./
+RUN chown -R test:test .
 
+USER test
+RUN npm install

@@ -98,7 +98,7 @@
     if (!confirm('ホットラインを解消してもよいですか？')) {
       return;
     }
-    duties.breakRelation(this.relation.userid);
+    duties.breakRelation(this.relation.relation_no);
   }
 
   move(event) {

@@ -1,8 +1,8 @@
 'use strict';
 
-var validation = require('../src/client/lib/indexedDatabase'),
-    chai = require('chai'),
-    expect = chai.expect;
+//var validation = require('../src/client/lib/indexedDatabase');
+var chai = require('chai');
+var expect = chai.expect;
 
 var funcs = {
   OBJECT_STORES: '',

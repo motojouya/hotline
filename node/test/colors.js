@@ -62,7 +62,7 @@ describe('calcColors', function() {
   it('23 max', function() {
     var result = calcColors(23);
     expect(result).to.be.a('string');
-    expect(result).to.equal('e77');
+    expect(result).to.equal('77e');
     expect(result).to.have.lengthOf(3);
   });
 });

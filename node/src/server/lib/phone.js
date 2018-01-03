@@ -1,5 +1,5 @@
 
-module.export = function (wss) {
+module.exports = function (wss) {
 
   wss.onReceive('ICE', 'ice_from_phone', function (userInfo, relation, contents, conn) {
     conn.done();

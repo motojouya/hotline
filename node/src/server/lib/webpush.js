@@ -37,8 +37,7 @@ const registerEndpoint = (req, res, webpush, vapidKeys) => {
         if (err) {
           console.error('Error committing transaction', err.stack);
         }
-        sendRelation(selfUserid, relation, wss);
-        res.json(relation);
+        res.json({result: true});
       });
     });
   });
@@ -46,20 +45,20 @@ const registerEndpoint = (req, res, webpush, vapidKeys) => {
 
 
 const sendWebpush = (userid, conn, message, subject, resolve, reject, webpush, vapidKeys) => {
-  conn.client.query(SELECT_WEBPUSH, [userInfo.userid], (err, result) => {
+  conn.client.query(SELECT_WEBPUSH, [userid], (err, result) => {
     conn.done();
     if (err) {
-      console.error('TODO', err);
+      console.error('SendWebpush. sql SELECT_WEBPUSH error.', err);
       return;
     }
     var results = result.rows;
     if (!results) {
-      console.log('TODO');
+      console.error('SendWebpush. no data.');
       return;
     }
     var len = results.length;
     for (var i = 0; i < len; i++) {
-      
+
       var pushSubscription = {
           endpoint: results[i].endpoint,
           keys: {
@@ -80,12 +79,11 @@ const sendWebpush = (userid, conn, message, subject, resolve, reject, webpush, v
         .catch((error) => {reject(error)});
     }
   });
-
 };
 
-module.export = (router, webpush, vapidKeys) => {
-  app.get('/webpush/vapidkey', (req, res) => getVapidKey(req, res, vapidKeys));
-  app.post('/webpush/register', (req, res) => registerEndpoint(req, res, webpush, vapidKeys));
+module.exports = (router, webpush, vapidKeys) => {
+  router.get('/webpush/vapidkey', (req, res) => getVapidKey(req, res, vapidKeys));
+  router.post('/webpush/register', (req, res) => registerEndpoint(req, res, webpush, vapidKeys));
   return {
     router: router,
     sendWebpush: (userid, conn, message, subject, resolve, reject) => {
