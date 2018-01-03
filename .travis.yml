@@ -19,9 +19,9 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 # install:
 before_script:
-  - docker-compose up -d
+  - docker-compose up -d app
 script:
-  - docker-compose run test
+  - docker-compose run exam
 # after_success:
 # # travis env set DOCKER_USERNAME myusername
 # # travis env set DOCKER_PASSWORD secretsecret
