@@ -58,5 +58,5 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: hotline
     ports:
-      - "5432:5432"
+      - "15432:5432"
 
