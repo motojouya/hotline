@@ -1,36 +1,36 @@
 version: '2'
 
 services:
-  exam:
+  test:
     depends_on:
-      - database
-      - hotline
+      - rdb
+      - app
     build: "./test"
 #   volumes:
 #     - "/home/docker/dev/test:/usr/local/src/test"
     links:
-      - "database:database"
-      - "hotline:hotline"
+      - "rdb:rdb"
+      - "app:app"
     environment:
       PG_USER: postgres
       PG_PASS: postgres
       PG_NAME: hotline
-      PG_HOST: database
+      PG_HOST: rdb
       PG_PORT: 5432
       PGPASSWORD: postgres
-      APP_HOST: hotline
+      APP_HOST: app
       APP_PORT: 3000
-    command: "dockerize -timeout 60s -wait tcp://database:5432 npm run test"
-  hotline:
+    command: "dockerize -timeout 60s -wait tcp://rdb:5432 npm run test"
+  app:
     depends_on:
-      - database
+      - rdb
     build: "./node"
     ports:
       - "8080:3000"
 #   volumes:
 #     - "/home/docker/dev/node:/usr/local/src/hotline"
     links:
-      - "database:database"
+      - "rdb:rdb"
     environment:
       PORT: 3000
       NODE_ENV: develop
@@ -38,7 +38,7 @@ services:
       PG_USER: postgres
       PG_PASSWORD: postgres
       PG_NAME: hotline
-      PG_HOST: database
+      PG_HOST: rdb
       PG_PORT: 5432
       SENDER_EMAIL: "mailto:motojouya@gmail.com"
       MAIL_SERVICE:
@@ -51,7 +51,7 @@ services:
       AWS_SECRET_KEY:
       AWS_REGION:
       S3_BUCKET:
-  database:
+  rdb:
     build: "./rdb"
     restart: always
     environment:
