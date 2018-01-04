@@ -25,6 +25,7 @@ services:
     depends_on:
       - rdb
     build: "./node"
+    image: motojouya/hotline
     ports:
       - "8080:3000"
 #   volumes:
@@ -40,7 +41,7 @@ services:
       PG_NAME: hotline
       PG_HOST: rdb
       PG_PORT: 5432
-      SENDER_EMAIL: "mailto:motojouya@gmail.com"
+      SENDER_EMAIL: "mailto:test@gmail.com"
       MAIL_SERVICE:
       MAIL_USER:
       MAIL_PASS:

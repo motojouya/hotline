@@ -23,11 +23,11 @@ before_script:
   - docker-compose up -d app
 script:
   - docker-compose run test
-# after_success:
-# # travis env set DOCKER_USERNAME myusername
-# # travis env set DOCKER_PASSWORD secretsecret
-#   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-#     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-#     docker-compose push motojouya/hotline;
-#     fi
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+    docker-compose push app;
+    fi
+# travis env set DOCKER_USERNAME myusername
+# travis env set DOCKER_PASSWORD secretsecret
 # after_failure
