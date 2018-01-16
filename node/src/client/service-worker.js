@@ -27,7 +27,7 @@ const STATIC_FILES = [
 const API_ORIGIN = ORIGIN + '/api/v1';
 const API_CONFIG = API_ORIGIN + '/config';
 const API_RELATION = API_ORIGIN + '/relation';
-const API_VOICE = API_ORIGIN + '/voices';
+const API_VOICE = API_ORIGIN + '/voice';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(STATIC_CACHE_NAME).then((cache) => {
@@ -44,25 +44,16 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(() => {
-    caches.keys().then((keys) => {
-      var promises = [];
-      keys.forEach((cacheName) => {
-        if (STATIC_CACHE_NAME !== cacheName) {
-          promises.push(caches.delete(cacheName));
-        }
-      });
-      return Promise.all(promises);
-    });
 
+  const connectWebSocket = (resolve, reject) => {
     ws.connect();
     ws.onReceive('VOICE', 'sway_voice', (data) => {
 
       let voice = data.contents
       voice.other_side = data.userid;
-      voice.side_time = data.userid + voice.spoken_at.toISOString();
+      voice.side_time = data.userid + '_' + voice.spoken_at;
       voice.saved = true;
-      db.put(db.OBJECT_STORES.VOICE.name, voice, () => {console.log('TODO');});
+      db.put(db.OBJECT_STORES.VOICES.name, voice, () => {console.log('TODO');});
 
       messagePort.postMessage(data);
     });
@@ -75,9 +66,20 @@ self.addEventListener('activate', (event) => {
     ws.onReceive('HUNGOFF', 'sway_hungoff', (data) => {
       messagePort.postMessage(data);
     });
+    resolve();
+  };
 
-    self.clients.claim();
-  });
+  const initializes = [self.clients.claim()];
+  initializes.push(new Promise(connectWebSocket));
+
+  event.waitUntil(caches.keys().then((keys) => {
+      keys.forEach((cacheName) => {
+        if (STATIC_CACHE_NAME !== cacheName) {
+          initializes.push(caches.delete(cacheName));
+        }
+      });
+      return Promise.all(initializes);
+    }));
 });
 
 const getConfig = (request) => {
@@ -85,10 +87,14 @@ const getConfig = (request) => {
   return fetch(request)
     .then((response) => {
       if (response.ok) {
-        let keptRes = response.clone();
-        let payload = JSON.parse(keptRes.body);
-        db.put(storeName, payload, () => {console.log('TODO');});
-        return keptRes;
+        return response.clone().body.getReader().read().then((body) => {
+          db.put(storeName, JSON.parse(new TextDecoder().decode(body.value)), () => {console.log('TODO');});
+          return new Response(body.value, {
+            statue: response.status,
+            statusText: response.statusText,
+            headers: response.headers
+          });
+        });
       } else {
         return new Promise((resolve) => {
           db.get(storeName, null, resolve);
@@ -100,20 +106,26 @@ const getConfig = (request) => {
 };
 
 const getRelation = (request, userid) => {
-  const storeName = db.OBJECT_STORES.RELATION.name;
+  const storeName = db.OBJECT_STORES.RELATIONS.name;
   return fetch(request)
     .then((response) => {
       if (response.ok) {
-        let keptRes = response.clone();
-        let payload = JSON.parse(keptRes.body);
-        let data;
-        if (payload.hasOwnProperty('hasNext')) {
-          data = payload.results;
-        } else {
-          data = payload;
-        }
-        db.put(storeName, data, () => {console.log('TODO');});
-        return keptRes;
+        return response.clone().body.getReader().read().then((body) => {
+          const payload = JSON.parse(new TextDecoder().decode(body.value));
+          let data;
+          if (payload.hasOwnProperty('hasNext')) {
+            data = payload.results;
+          } else {
+            data = payload;
+          }
+          db.put(storeName, data, () => {console.log('TODO');});
+
+          return new Response(body.value, {
+            statue: response.status,
+            statusText: response.statusText,
+            headers: response.headers
+          });
+        });
       } else if (userid) {
         return new Promise((resolve) => {
           db.get(storeName, params.userid, resolve);
@@ -131,19 +143,24 @@ const getRelation = (request, userid) => {
 };
 
 const getVoice = (request, userid) => {
-  const storeName = db.OBJECT_STORES.VOICE.name;
+  const storeName = db.OBJECT_STORES.VOICES.name;
   return fetch(request)
     .then((response) => {
       if (response.ok) {
-        let keptRes = response.clone();
-        let payload = JSON.parse(keptRes.body);
-        payload.forEach((voice) => {
-          voice.other_side = userid;
-          voice.side_time = userid + voice.spoken_at.toISOString();
-          voice.saved = true;
+        return response.clone().body.getReader().read().then((body) => {
+          let voices = JSON.parse(new TextDecoder().decode(body.value)).results.map((voice) => {
+            voice.other_side = userid;
+            voice.side_time = userid + '_' + voice.spoken_at;
+            voice.saved = true;
+            return voice;
+          });
+          db.put(storeName, voices, () => {console.log('TODO');});
+          return new Response(body.value, {
+            statue: response.status,
+            statusText: response.statusText,
+            headers: response.headers
+          });
         });
-        db.put(storeName, payload, () => {console.log('TODO');});
-        return keptRes;
       } else {
         return new Promise((resolve) => {
           db.getByIndexOnly(storeName, 'other_side', userid, 'prev', resolve);
@@ -157,7 +174,8 @@ const getVoice = (request, userid) => {
 self.addEventListener('fetch', function(event) {
 
   let keptReq = event.request.clone();
-  if (STATIC_FILES.index(keptReq.url) !== -1) {
+  console.log(keptReq.url);
+  if (STATIC_FILES.indexOf(keptReq.url) !== -1) {
     event.respondWith(caches.match(keptReq, {cacheName: STATIC_CACHE_NAME}));
     return;
   }
@@ -166,8 +184,13 @@ self.addEventListener('fetch', function(event) {
       event.respondWith(getConfig(keptReq));
       return;
     }
+    if (keptReq.url.indexOf('/voice') != -1) {
+      let userid = keptReq.url.slice(API_RELATION.length + 1).split(/\//)[0];
+      event.respondWith(getVoice(keptReq, userid));
+      return;
+    }
     if (keptReq.url.startsWith(API_RELATION)) {
-      let parameters = keptReq.url.slice(API_VOICE.length + 1).split(/\?/)[1].split(/&/);
+      let parameters = keptReq.url.slice(API_RELATION.length + 1).split(/&/);
       let userid;
       parameters.forEach((parameter) => {
         if (parameter.startsWith('userid')) {
@@ -175,11 +198,6 @@ self.addEventListener('fetch', function(event) {
         }
       });
       event.respondWith(getRelation(keptReq, userid));
-      return;
-    }
-    if (keptReq.url.startsWith(API_VOICE)) {
-      let userid = keptReq.url.slice(API_VOICE.length + 1).split(/\//)[0];
-      event.respondWith(getVoice(keptReq, userid));
       return;
     }
   }
@@ -206,18 +224,21 @@ self.addEventListener('notificationclick', (event) => {
 
 const keepVoice = (event) => {
   let data = event.data;
-  let voice = data.contents
-  voice.other_side = data.userid;
-  voice.side_time = data.userid + voice.spoken_at.toISOString();
-
+  if (!data || 'object' !== typeof data) {
+    return;
+  }
   if (ws) {
     ws.sendMessage(data);
-    voice.saved = true;
+    // voice.saved = true;
   } else {
-    voice.saved = false;
+    // voice.saved = false;
     messagePort.postMessage('sync_send_voice');
   }
-  db.put(db.OBJECT_STORES.VOICE.name, voice, () => {console.log('TODO');});
+  // let voice = data.contents
+  // voice.other_side = data.userid;
+  // voice.side_time = data.userid + '_' + voice.spoken_at;
+  // voice.saved = false;
+  // db.put(db.OBJECT_STORES.VOICES.name, voice, () => {console.log('TODO');});
 };
 
 self.addEventListener('message', (event) => {
@@ -231,13 +252,13 @@ self.addEventListener('message', (event) => {
     }).catch(error => {
       console.error(error);
     });
-  e.waitUntil(promise);
+  event.waitUntil(promise);
 });
 
 self.addEventListener('sync', (event) => {
   if (event.tag === 'send_voice') {
     ws.connectWebSocket();
-    db.getByIndexOnly(db.OBJECT_STORES.VOICE.name, 'saved', true, 'next', (result) => {
+    db.getByIndexOnly(db.OBJECT_STORES.VOICES.name, 'saved', true, 'next', (result) => {
       result.forEach((item) => {
         var message = {
           type: 'VOICE',

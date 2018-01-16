@@ -33,16 +33,29 @@ const initDB = () => {
     event.target.transaction.onerror = (err) => {
       console.log("XXX0", err);
     };
-    OBJECT_STORES.forEach((storeConfig) => {
-      const name = storeConfig.name;
-      if (db.objectStoreNames.contains(name)) {
-        db.deleteObjectStore(name);
+    for (let storeConfigKey in OBJECT_STORES) {
+      if (OBJECT_STORES.hasOwnProperty(storeConfigKey)) {
+        var storeConfig = OBJECT_STORES[storeConfigKey];
+        const name = storeConfig.name;
+        if (db.objectStoreNames.contains(name)) {
+          db.deleteObjectStore(name);
+        }
+        objectStrores[name] = db.createObjectStore(name, storeConfig.option);
+        if (storeConfig.func) {
+          storeConfig.func(objectStrores[name]);
+        }
       }
-      objectStrores[name] = db.createObjectStore(name, storeConfig.option);
-      if (storeConfig.func) {
-        storeConfig.func(objectStrores[name]);
-      }
-    });
+    }
+    // OBJECT_STORES.forEach((storeConfig) => {
+    //   const name = storeConfig.name;
+    //   if (db.objectStoreNames.contains(name)) {
+    //     db.deleteObjectStore(name);
+    //   }
+    //   objectStrores[name] = db.createObjectStore(name, storeConfig.option);
+    //   if (storeConfig.func) {
+    //     storeConfig.func(objectStrores[name]);
+    //   }
+    // });
   };
   openReq.onsuccess = (event) => {
     db = (event.target) ? event.target.result : event.result;

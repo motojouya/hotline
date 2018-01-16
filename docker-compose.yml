@@ -21,6 +21,16 @@ services:
       APP_HOST: app
       APP_PORT: 3000
     command: "dockerize -timeout 60s -wait tcp://rdb:5432 npm run test"
+  proxy:
+    depends_on:
+      - rdb
+      - app
+    build: "./proxy"
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - "app:app"
   app:
     depends_on:
       - rdb

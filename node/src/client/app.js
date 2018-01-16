@@ -13,7 +13,7 @@ import relation from './app/relation';
 window.addEventListener('DOMContentLoaded', function (event) {
 
   if (location.protocol === 'https:') {
-    window.navigator.serviceWorker.register('service-worker.js').catch(console.error.bind(console));
+    window.navigator.serviceWorker.register('/sw.js').catch(err => console.error(err));
   }
 
   const frame = getFrame(document);

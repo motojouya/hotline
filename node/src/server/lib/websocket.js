@@ -38,6 +38,7 @@ module.exports = (server, sessionParser, dbConnect, sendWebpush) => {
       });
     },
     server: server,
+    path: '/websocket',
   });
 
   const sendMessage = function (userid, contents, conn) {

@@ -71,7 +71,10 @@ export default (whenErr) => {
         }
       }
     };
-    sendMessageSW = navigator.serviceWorker.controller.postMessage;
+    //var sendMessageSW = navigator.serviceWorker.controller.postMessage;
+    sendMessageSW = (message, ports) => {
+      navigator.serviceWorker.controller.postMessage(message, ports);
+    };
     onReceive('SYNC', 'sync_request', (data) => {
       navigator.serviceWorker.ready.then(function(register) {
         return register.sync.register('send_voice');

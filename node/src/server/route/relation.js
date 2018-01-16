@@ -360,6 +360,19 @@ const sendVoice = (wss, selfUserid, message, conn) => {
         return wss.sendMessage(selfUserid, 'send message failure.', conn);
       }
       console.log('SendVoice. success.');
+      wss.sendMessage(selfUserid, {
+        type: 'VOICE',
+        userid: selfUserid,
+        contents: {
+          commit: true,
+          relation_no: relation.relation_no,
+          voice: {
+            spoken_at: '',
+            userid: selfUserid,
+            sentence: contents.sentence,
+          },
+        }
+      }, conn);
       wss.sendMessage(relation.userid, {
         type: 'VOICE',
         userid: selfUserid,

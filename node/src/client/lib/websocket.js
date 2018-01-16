@@ -52,7 +52,7 @@ export default function (whenErr) {
 
   var init = (onFirst) => {
 
-    var url = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host;// + (location.port ? ':' + location.port : '');// + '/api/ws';
+    var url = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/websocket';
     wsConn = new WebSocket(url);
 
     wsConn.onopen = onFirst;

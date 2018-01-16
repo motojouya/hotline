@@ -6,3 +6,4 @@ node/building/
 node/public/app/img/
 test/DockerDevelop
 test/node_modules/
+aws/

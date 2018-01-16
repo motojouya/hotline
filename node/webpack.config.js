@@ -2,12 +2,13 @@ const path = require('path')
 
 module.exports = {
   entry: {
-    "app": './building/client/app.js',
-    "register": './building/client/register.js',
+    "app/bundle": './building/client/app.js',
+    "register/bundle": './building/client/register.js',
+    "sw": './building/client/service-worker.js',
   },
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: '[name]/bundle.js'
+    filename: '[name].js'
   }
 };
 
