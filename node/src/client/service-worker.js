@@ -58,11 +58,6 @@ const connectWebSocket = (resolve, reject) => {
   ws.onReceive('HUNGOFF', 'sway_hungoff', (data) => {
     messagePort.postMessage(data);
   });
-
-  ws.onReceive('VOICE', 'sway_voice', VoiceUtils.swayVoice.bind(null, db, messagePort));
-  ws.onReceive('ICE', 'sway_ice', messagePort.postMessage.bind(messagePort));
-  ws.onReceive('CALL', 'sway_call', messagePort.postMessage.bind(messagePort));
-  ws.onReceive('HUNGOFF', 'sway_hungoff', messagePort.postMessage.bind(messagePort));
   resolve();
 };
 
