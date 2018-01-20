@@ -69,8 +69,8 @@ export default function (whenErr) {
           key,
           funcs;
       if (event && event.data) {
-        data = event.data;
-        funcs = listeners[data.type].concat(listeners['ALL']);
+        data = JSON.parse(event.data);
+        funcs = listeners[data.type];//.concat(listeners['ALL']);
         for (key in funcs) {
           if (funcs.hasOwnProperty(key) && funcs[key].toString() === 'Function') {
             funcs[key](data);

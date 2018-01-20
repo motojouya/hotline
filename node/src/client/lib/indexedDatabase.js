@@ -6,27 +6,10 @@ const IDBKeyRange = self.IDBKeyRange || self.webkitIDBKeyRange || self.msIDBKeyR
 const VERSION = 1;
 const DB_NAME = 'hostline';
 
-const OBJECT_STORES = {};
-OBJECT_STORES.RELATIONS = {
-  name: 'relations',
-  option: {keyPath:'userid'},
-};
-OBJECT_STORES.VOICES = {
-  name: 'voices',
-  option: {keyPath:'side_time'},
-  func: (objectStore) => {
-    objectStore.createIndex('other_side', 'other_side', { unique: false });
-  },
-};
-OBJECT_STORES.CONFIG = {
-  name: 'config',
-  option: {keyPath:'userid'},
-};
-
 let db;
 const objectStrores ={};
 
-const initDB = () => {
+const initDB = (OBJECT_STORES) => {
   const openReq = indexedDB.open(DB_NAME, VERSION);
   openReq.onupgradeneeded = (event) => {
     const db = event.target.result;
@@ -169,15 +152,14 @@ const closeDB = () => {
   db = null;
 };
 
-export default () => {
+export default (OBJECT_STORES) => {
   if (!indexedDB) {
     console.log('cant use indexeddb.');
   }
   if (!db) {
-    initDB();
+    initDB(OBJECT_STORES);
   }
   return {
-    OBJECT_STORES: OBJECT_STORES,
     put: put,
     get: get,
     getAll: getAll,

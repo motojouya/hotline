@@ -1,72 +1,28 @@
+import RelationDictionary from '../models/relationDictionary';
 
-var getRelationsObj = function (observe) {
-  var relationDic = {};
-  observe(relationDic);
+export default (frame, api, ws, riot, route) => {
+  route('app', () => {
 
-  relationDic.set = function (relationAry) {
-    var i = 0,
-        len = relationAry.length,
-        relation,
-        key,
-        obj;
-
-    for (; i < len; i++) {
-      obj = relationAry[i];
-      relation = relationDic[obj.relation_no] || {};
-
-      for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          relation[key] = obj[key];
-        }
-      }
-      relationDic[obj.relation_no] = relation;
-    }
-  };
-  return relationDic;
-};
-
-var connect = function (relationDic, ws) {
-  ws.onReceive('RELATE', 'relations', function (payload) {
-    relationDic.set(payload);
-  });
-
-  return function (path) {
-    ws.cancelListener('RELATE', 'relations');
-    route(path);
-  };
-};
-
-export default function (frame, api, ws, riot, route) {
-  route('app', function () {
-
-    var relationDic = getRelationsObj(riot.observable),
-        transfer = connect(relationDic, ws),
-        relationLoaded = false,
-        domLoaded = false;
-
-    var build = function () {
-      riot.mount('section#menu > menu', 'menu', {
-        schema: relationDic,
-        duties: {transfer: transfer}
-      });
-      frame.pause(false);
-    };
+    const relationDic = RelationDictionary.getRelationsObj(riot.observable),
+          cancelWebSocket = RelationDictionary.listenWebSocket(relationDic, ws);
 
     frame.pause(true);
     frame.clear();
 
-    frame.load('menu', 'menu', function () {
-      if (relationLoaded) {
-        build();
-      }
-      domLoaded = true;
-    });
-    api.loadRelations(0, function (results) {
-      relationDic.set(results);
-      if (domLoaded && !relationLoaded) {
-        build();
-      }
-      relationLoaded = true;
+    Promise.all([
+      new Promise(frame.load.bind(frame, 'menu', 'menu')),
+      new Promise(RelationDictionary.loadRelations.bind(null, api, relationDic, 0)),
+    ]).then(() => {
+      riot.mount('section#menu > menu', 'menu', {
+        schema: relationDic,
+        duties: {
+          transfer: (path) => {
+            cancelWebSocket();
+            route(path);
+          }
+        }
+      });
+      frame.pause(false);
     });
 
   });

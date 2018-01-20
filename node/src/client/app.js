@@ -10,7 +10,7 @@ import menu from './app/menu';
 import config from './app/config';
 import relation from './app/relation';
 
-window.addEventListener('DOMContentLoaded', function (event) {
+window.addEventListener('DOMContentLoaded', (event) => {
 
   if (location.protocol === 'https:') {
     window.navigator.serviceWorker.register('/sw.js').catch(err => console.error(err));
@@ -18,6 +18,14 @@ window.addEventListener('DOMContentLoaded', function (event) {
 
   const frame = getFrame(document);
   const api = getAPI(frame.whenErr);
+
+  const login = (userid, password, onetimePassword, callback) => {
+    api.post('/api/v1/login', {
+      userid: userid,
+      password: password,
+      onetime_password: onetimePassword,
+    }, callback);
+  };
 
   const startApplication = (userInfo) => {
 
@@ -27,7 +35,7 @@ window.addEventListener('DOMContentLoaded', function (event) {
     } else {
       ws = getWS(frame.whenErr);
     }
-    var phone = getPhone(ws);
+    const phone = getPhone(ws);
 
     route.base('/');
 
@@ -45,10 +53,10 @@ window.addEventListener('DOMContentLoaded', function (event) {
     }
   };
 
-  var query = api.getQueryDictionary(location.search),
-      onetimePassword = query && query.onetime_password;
+  const query = api.getQueryDictionary(location.search),
+        onetimePassword = query && query.onetime_password;
 
-  api.login(null, null, null, (result) => {
+  login(null, null, null, (result) => {
     if (result.login) {
       startApplication(result.config);
 
@@ -59,7 +67,7 @@ window.addEventListener('DOMContentLoaded', function (event) {
         riot.mount('login', 'login', {
           schema: onetimePassword,
           duties: {
-            login: api.login,
+            login: login,
             transfer: startApplication,
           }
         });

@@ -1,3 +1,4 @@
+'use strict';
 
 const colorNumberBase = 7,
       colorNumberRange = 8;

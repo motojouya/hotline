@@ -14,30 +14,28 @@ const urlB64ToUint8Array = (base64String) => {
 var swRegistration;
 var vapidKey;
 
-const registerPushManager = (xhr, swRegistration, vapidKey) => {
+const registerPushManager = (api, swRegistration, vapidKey) => {
   swRegistration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlB64ToUint8Array(vapidKey),
   }).then(subscription => {
-    xhr.registerWebPush(subscription, (err, res) => {
-      if (err) {
-        console.log("Subscribe Error:", err);
-      }
+    api.post('/api/v1/webpush/vapidkey', subscription, (body) => {
+      console.log(body.result);
     });
   });
 };
 
-const registerServiceWorker = (xhr, navigator) => {
-  xhr.getVapidKey((vapidkey) => {
-    vapidKey = vapidkey;
+const registerServiceWorker = (api, navigator) => {
+  api.get('/api/v1/webpush/vapidkey', (body) => {
+    vapidKey = body.publicKey;
     if (swRegistration) {
-      registerPushManager(xhr, swRegistration, vapidKey);
+      registerPushManager(api, swRegistration, vapidKey);
     }
   });
   navigator.serviceWorker.ready.then((registration) => {
     swRegistration = registration;
     if (vapidKey) {
-      registerPushManager(xhr, swRegistration, vapidKey);
+      registerPushManager(api, swRegistration, vapidKey);
     }
   });
 };
@@ -62,7 +60,7 @@ const requestNotificationPermission = (navigator, callback) => {
   });
 }
 
-export default (xhr, navigator) => {
-  requestNotificationPermission(navigator, () => registerServiceWorker(xhr, navigator));
+export default (api, navigator) => {
+  requestNotificationPermission(navigator, () => registerServiceWorker(api, navigator));
 };
 

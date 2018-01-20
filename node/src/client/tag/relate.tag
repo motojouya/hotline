@@ -10,7 +10,7 @@
 <main>
   <div>{subscription}<div>
   <dl class="def">
-    <virtual if={relation}>
+    <virtual if={isApplying(relation)}>
       <dt class="flex">
         <div class="term fixeditem">相手のID</div>
         <div class="above_line variableitem"></div>
@@ -36,7 +36,7 @@
         <span>申請中</span>
       </dd>
     </virtual>
-    <virtual if={!relation}>
+    <virtual if={!isApplying(relation)}>
       <dt class="flex">
         <div class="term fixeditem">相手のID</div>
         <div class="above_line variableitem"></div>
@@ -48,7 +48,7 @@
         </div>
       </dd>
     </virtual>
-    <virtual if={!relation || !relation.is_applicant}>
+    <virtual if={!isApplying(relation) || !relation.is_applicant}>
       <dt class="flex">
         <div class="term fixeditem">相手の合言葉</div>
         <div class="above_line variableitem"></div>
@@ -61,27 +61,30 @@
       </dd>
     </virtual>
     <dd>
-      <virtual if={relation}>
+      <virtual if={isApplying(relation)}>
         <button type="button" onclick={breakRalation} >申請削除</button>
       </virtual>
-      <virtual if={!relation || !relation.is_applicant}>
+      <virtual if={!isApplying(relation) || !relation.is_applicant}>
         <button type="button" onclick={makeRalation} >ホットライン申請</button>
       </virtual>
     </dd>
   </dl>
 </main>
 <script>
-
   var duties = opts.duties;
 
   this.relation = opts.schema;
+
+  isApplying(relation) {
+    return relation.status && relation.status === 'PENDING';
+  }
 
   makeRalation(event) {
 
     var userid,
         countersign = this.refs.countersign.value;
 
-    if (this.relation) {
+    if (this.isApplying(this.relation)) {
       userid = this.relation.userid;
     } else {
       userid = this.refs.userid.value;

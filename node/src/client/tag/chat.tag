@@ -205,5 +205,21 @@
     left: 0;
     right: 0;
   }
+  /* .voice_input_wrap {
+    height: 2rem;
+    width: 100%;
+  } */
+  .voice_input {
+    height: 100%;
+    width: 100%;
+  }
+  .relation_name {
+    margin-left: 5px;
+    font-weight: normal;
+    line-height: 2.1rem;
+  }
+  .name_header {
+    margin: 3px 5px 3px 5px;
+  }
 </style>
 </chat>
