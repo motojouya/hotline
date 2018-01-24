@@ -2,7 +2,6 @@
 
 const nodemailer = require('nodemailer');
 
-/*
 const setting = {
   host: process.env.MAIL_HOST,
   port: process.env.MAIL_PORT,
@@ -11,11 +10,11 @@ const setting = {
   user: process.env.MAIL_USER,
   pass: process.env.MAIL_PASS,
 };
-const mailer = nodemailer.createTransport('SMTP', setting);
-*/
+// const mailer = nodemailer.createTransport('SMTP', setting);
 
 // const SELECT_USER = 'SELECT userid, email, name, countersign, active, color, notification, registered_at, thumbnail FROM users WHERE userid = $1';
 
+/*
 const setting = {
   service: process.env.MAIL_SERVICE,
   auth: {
@@ -24,6 +23,7 @@ const setting = {
     port: process.env.MAIL_PORT,
   }
 };
+*/
 
 const from = process.env.MAIL_FROM;
 
