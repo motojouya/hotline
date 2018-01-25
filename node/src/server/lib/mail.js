@@ -2,6 +2,7 @@
 
 const nodemailer = require('nodemailer');
 
+/*
 const setting = {
   host: process.env.MAIL_HOST,
   port: process.env.MAIL_PORT,
@@ -10,6 +11,7 @@ const setting = {
   user: process.env.MAIL_USER,
   pass: process.env.MAIL_PASS,
 };
+*/
 // const mailer = nodemailer.createTransport('SMTP', setting);
 
 // const SELECT_USER = 'SELECT userid, email, name, countersign, active, color, notification, registered_at, thumbnail FROM users WHERE userid = $1';
@@ -38,7 +40,14 @@ module.exports = (nodemailer) => {
   }
 
   if (!mailer) {
-    mailer = nodemailer.createTransport('SMTP', setting);
+    mailer = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: process.env.MAIL_PORT,
+      ssl: true,
+      use_authentication: true,
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
+    });
   }
   return (mailto, subject, text) => {
     var message = {
