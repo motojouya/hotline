@@ -4,6 +4,7 @@ node/node_modules/
 node/dist/
 node/building/
 node/public/app/img/
+node/package-lock.json
 test/DockerDevelop
 test/node_modules/
 aws/

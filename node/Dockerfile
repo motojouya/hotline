@@ -4,13 +4,13 @@ RUN export DEBIAN_FRONTEND=noninteractive LANG && \
     apt-get update && \
     apt-get install -y apt-utils && \
     apt-get install -y locales && \
-    echo en_US.UTF-8 UTF-8 > /etc/locale.gen && \
-    locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8
+    echo ja_JP.UTF-8 UTF-8 > /etc/locale.gen && \
+    locale-gen ja_JP.UTF-8 && \
+    update-locale LANG=ja_JP.UTF-8
 
-ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8 \
+ENV LANG=ja_JP.UTF-8 \
+    LANGUAGE=ja_JP.UTF-8 \
+    LC_ALL=ja_JP.UTF-8 \
     NODE_PATH=/usr/local/lib/node_modules
 
 RUN npm install -g riot && \

@@ -19,7 +19,7 @@ const registerPushManager = (api, swRegistration, vapidKey) => {
     userVisibleOnly: true,
     applicationServerKey: urlB64ToUint8Array(vapidKey),
   }).then(subscription => {
-    api.post('/api/v1/webpush/vapidkey', subscription, (body) => {
+    api.post('/api/v1/webpush/register', subscription, (body) => {
       console.log(body.result);
     });
   });
